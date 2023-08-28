@@ -19,7 +19,7 @@ logger = papis.logging.get_logger(__name__)
 
 DEFAULT_OPTIONS = {
     "plugins.extract": {
-        "tags": {"important": "red", "toread": "blue"},
+        "tags": {},
         "on_import": False,
         "minimum_similarity": 0.75,  # for checking against existing annotations
         "minimum_similarity_content": 0.9,  # for checking if highlight or note
