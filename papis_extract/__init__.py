@@ -21,9 +21,9 @@ DEFAULT_OPTIONS = {
     "plugins.extract": {
         "tags": {"important": "red", "toread": "blue"},
         "on_import": False,
-        "minimum_similarity": 0.75, # for checking against existing annotations
-        "minimum_similarity_content": 0.9, # for checking if highlight or note
-        "minimum_similarity_color": 0.833 # for matching tag to color
+        "minimum_similarity": 0.75,  # for checking against existing annotations
+        "minimum_similarity_content": 0.9,  # for checking if highlight or note
+        "minimum_similarity_color": 0.833,  # for matching tag to color
     }
 }
 papis.config.register_default_settings(DEFAULT_OPTIONS)

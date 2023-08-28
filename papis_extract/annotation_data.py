@@ -71,8 +71,7 @@ class Annotation:
         )
         nearest = None
         minimum_similarity = (
-            papis.config.getfloat("minimum_similarity_color", "plugins.extract")
-            or 1.0
+            papis.config.getfloat("minimum_similarity_color", "plugins.extract") or 1.0
         )
         for name, values in COLORS.items():
             similarity_ratio = self._color_similarity_ratio(values, annot_colors)
