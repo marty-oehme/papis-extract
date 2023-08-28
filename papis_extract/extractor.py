@@ -2,11 +2,14 @@ from pathlib import Path
 
 import Levenshtein
 import fitz_new as fitz
+import papis.logging
 import papis.config
 
 from papis_extract.annotation_data import Annotation
 
 COLOR_MAPPING = {}
+
+logger = papis.logging.get_logger(__name__)
 
 
 def start(filename: Path) -> list[Annotation]:
@@ -30,6 +33,10 @@ def start(filename: Path) -> list[Annotation]:
                 )
                 a.tag = _tag_from_colorname(a.colorname)
                 annotations.append(a)
+    logger.debug(
+        f"Found {len(annotations)} "
+        f"{'annotation' if len(annotations) == 1 else 'annotations'} for {filename}."
+    )
     return annotations
 
 

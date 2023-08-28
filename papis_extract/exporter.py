@@ -88,10 +88,10 @@ def _add_annots_to_note(
         f.write("\n".join(new_annotations))
         f.write("\n")
         logger.info(
-            f"Wrote {len(new_annotations)} annotations "\
+            f"Wrote {len(new_annotations)} "
+            f"{'annotation' if len(new_annotations) == 1 else 'annotations'}"
             f"to {papis.document.describe(document)}"
         )
-
 
     if git:
         msg = "Update notes for '{0}'".format(papis.document.describe(document))
