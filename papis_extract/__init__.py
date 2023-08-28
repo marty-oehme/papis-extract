@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 
 import click
 import fitz_new as fitz
@@ -108,10 +109,9 @@ def _get_annotations_for_documents(
                 print(f"File structure errors for {file}.\n{e}")
 
         if not found_pdf:
-            logger.warning(
-                "Did not find suitable PDF file for document: "
-                f"{papis.document.describe(doc)}"
-            )
+            # have to remove curlys or papis logger gets upset
+            desc = re.sub("[{}]", "", papis.document.describe(doc))
+            logger.warning("Did not find suitable PDF file for document: " f"{desc}")
         output.append(AnnotatedDocument(doc, annotations))
     return output
 
