@@ -18,6 +18,12 @@ def _format_annotation(annotation: Annotation) -> str:
 
 
 def to_stdout(annots: list[AnnotatedDocument]) -> None:
+    """Pretty print annotations to stdout.
+
+    Gives a nice human-readable representations of
+    the annotations in somewhat of a list form.
+    Not intended for machine-readability.
+    """
     if not annots:
         return
 
@@ -25,13 +31,18 @@ def to_stdout(annots: list[AnnotatedDocument]) -> None:
         if not entry.annotations:
             continue
 
-        title_decoration = "=" * len(entry.document.get("title", ""))
+        title_decoration = (
+            f"{'=' * len(entry.document.get('title', ''))}   "
+            f"{'-' * len(entry.document.get('author', ''))}"
+        )
         print(
             f"{title_decoration}\n{papis.document.describe(entry.document)}\n{title_decoration}\n"
         )
         for a in entry.annotations:
             print(_format_annotation(a))
-        print("\n")
+
+        if entry != annots[-1]:
+            print("\n")
 
 
 def to_notes(annots: list[AnnotatedDocument], edit: bool, git: bool) -> None:
