@@ -1,9 +1,9 @@
-import re
 import math
 from dataclasses import dataclass, field
 
 import papis.config
 from papis.document import Document
+import chevron
 
 TEXT_SIMILARITY_MINIMUM = 0.75
 COLOR_SIMILARITY_MINIMUM = 0.833
@@ -23,12 +23,13 @@ class Annotation:
     """A PDF annotation object"""
 
     file: str
-    type: str = "Highlight"
-    text: str = ""
-    content: str = ""
-    page: int = 1
     colors: dict = field(default_factory=lambda: {"stroke": (0.0, 0.0, 0.0)})
+    content: str = ""
+    page: int = 0
     tag: str = ""
+    text: str = ""
+    type: str = "Highlight"
+    minimum_similarity_color: float = 1.0
 
     def format(self, formatting):
         """Return a formatted string of the annotation.
@@ -37,27 +38,15 @@ class Annotation:
         formatted with the correct marker replacements and removals, ready
         for display or writing.
         """
-        output = formatting
-        replacements = {
-            r"{quote}": self.text,
-            r"{note}": self.content,
-            r"{page}": str(self.page),
-            r"{newline}": "\n",
-            r"{tag}": self.tag,
+        data = {
+            "file": self.file,
+            "quote": self.text,
+            "note": self.content,
+            "page": self.page,
+            "tag": self.tag,
+            "type": self.type,
         }
-        pattern = re.compile(
-            "|".join(
-                [re.escape(k) for k in sorted(replacements, key=len, reverse=True)]
-            ),
-            flags=re.DOTALL,
-        )
-        patt_quote_container = re.compile(r"{%quote_container(.*?)%}")
-        patt_note_container = re.compile(r"{%note_container(.*?)%}")
-        patt_tag_container = re.compile(r"{%tag_container(.*?)%}")
-        output = patt_quote_container.sub(r"\1" if self.text else "", output)
-        output = patt_note_container.sub(r"\1" if self.content else "", output)
-        output = patt_tag_container.sub(r"\1" if self.tag else "", output)
-        return pattern.sub(lambda x: replacements[x.group(0)], output)
+        return chevron.render(formatting, data)
 
     @property
     def colorname(self):
@@ -73,9 +62,10 @@ class Annotation:
         minimum_similarity = (
             papis.config.getfloat("minimum_similarity_color", "plugins.extract") or 1.0
         )
+        minimum_similarity = self.minimum_similarity_color
         for name, values in COLORS.items():
             similarity_ratio = self._color_similarity_ratio(values, annot_colors)
-            if similarity_ratio > minimum_similarity:
+            if similarity_ratio >= minimum_similarity:
                 minimum_similarity = similarity_ratio
                 nearest = name
         return nearest
