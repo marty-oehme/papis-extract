@@ -23,7 +23,7 @@ class Annotation:
     """A PDF annotation object"""
 
     file: str
-    colors: dict = field(default_factory=lambda: {"stroke": (0.0, 0.0, 0.0)})
+    colors: tuple[float, float, float] = field(default_factory=lambda: (0.0, 0.0, 0.0))
     content: str = ""
     page: int = 0
     tag: str = ""
@@ -56,7 +56,7 @@ class Annotation:
         using euclidian distance between the two color vectors.
         """
         annot_colors = (
-            self.colors.get("stroke") or self.colors.get("fill") or (0.0, 0.0, 0.0)
+            self.colors or (0.0, 0.0, 0.0)
         )
         nearest = None
         minimum_similarity = (

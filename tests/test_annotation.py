@@ -27,7 +27,7 @@ def test_formatting(fmt_string, expected):
 
 def test_colorname_matches_exact():
     sut = Annotation(
-        "testfile", colors={"stroke": (1.0,0.0,0.0)}, minimum_similarity_color=1.0
+        "testfile", colors=(1.0,0.0,0.0), minimum_similarity_color=1.0
     )
     c_name = sut.colorname
     assert c_name == "red"
@@ -45,7 +45,7 @@ def test_colorname_matches_exact():
 )
 def test_matches_inexact_colorname(color_value):
     sut = Annotation(
-        "testfile", colors={"stroke": color_value}, minimum_similarity_color=0.833
+        "testfile", colors=color_value, minimum_similarity_color=0.833
     )
     c_name = sut.colorname
     assert c_name == "red"

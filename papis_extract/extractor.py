@@ -14,12 +14,13 @@ from papis_extract.annotation_data import Annotation, AnnotatedDocument
 
 logger = papis.logging.get_logger(__name__)
 
+
 def start(
     documents: list[Document],
 ) -> list[AnnotatedDocument]:
     """Extract all annotations from passed documents.
 
-    Returns all annotations contained in the papis 
+    Returns all annotations contained in the papis
     documents passed in.
     """
 
@@ -45,6 +46,7 @@ def start(
         output.append(AnnotatedDocument(doc, annotations))
     return output
 
+
 def extract(filename: Path) -> list[Annotation]:
     """Extract annotations from a file.
 
@@ -58,11 +60,16 @@ def extract(filename: Path) -> list[Annotation]:
                 quote, note = _retrieve_annotation_content(page, annot)
                 if not quote and not note:
                     continue
+                col = (
+                    annot.colors.get("fill")
+                    or annot.colors.get("stroke")
+                    or (0.0, 0.0, 0.0)
+                )
                 a = Annotation(
                     file=str(filename),
                     text=quote or "",
                     content=note or "",
-                    colors=annot.colors,
+                    colors=col,
                     type=annot.type[1],
                     page=(page.number or 0) + 1,
                 )
@@ -79,8 +86,6 @@ def is_pdf(fname: Path) -> bool:
     return magic.from_file(fname, mime=True) == "application/pdf"
 
 
-
-
 def _is_file_processable(fname: Path) -> bool:
     if not fname.is_file():
         logger.error(f"File {str(fname)} not readable.")
@@ -88,6 +93,7 @@ def _is_file_processable(fname: Path) -> bool:
     if not is_pdf(fname):
         return False
     return True
+
 
 def _tag_from_colorname(colorname: str) -> str:
     color_mapping: dict[str, str] = getdict("tags", "plugins.extract")
