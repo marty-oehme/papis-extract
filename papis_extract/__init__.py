@@ -1,19 +1,14 @@
-from pathlib import Path
-import re
-
 import click
-import fitz_new as fitz
-import magic
 import papis.cli
 import papis.config
 import papis.document
-from papis.document import Document
 import papis.logging
 import papis.notes
 import papis.strings
+from papis.document import Document
 
 from papis_extract import extractor, exporter
-from papis_extract.annotation_data import Annotation, AnnotatedDocument
+from papis_extract.annotation_data import AnnotatedDocument
 
 logger = papis.logging.get_logger(__name__)
 
@@ -76,50 +71,19 @@ def main(
         logger.warning(papis.strings.no_documents_retrieved_message)
         return
 
-    doc_annotations: list[AnnotatedDocument] = _get_annotations_for_documents(documents)
+    run(documents, edit=manual, write=write, git=git)
+
+
+def run(
+    documents: list[Document],
+    edit: bool = False,
+    write: bool = False,
+    git: bool = False,
+) -> None:
+
+    doc_annotations: list[AnnotatedDocument] = extractor.start(documents)
 
     if write:
-        exporter.to_notes(doc_annotations, edit=manual, git=git)
+        exporter.to_notes(doc_annotations, edit=edit, git=git)
     else:
         exporter.to_stdout(doc_annotations)
-
-    # note_file: Path = Path(papis.notes.notes_path_ensured(documents[0]))
-
-
-def is_pdf(fname: Path) -> bool:
-    return magic.from_file(fname, mime=True) == "application/pdf"
-
-
-def _get_annotations_for_documents(
-    documents: list[Document],
-) -> list[AnnotatedDocument]:
-    output: list[AnnotatedDocument] = []
-    for doc in documents:
-        annotations: list[Annotation] = []
-        found_pdf: bool = False
-        for file in doc.get_files():
-            fname = Path(file)
-            if not _is_file_processable(fname):
-                break
-            found_pdf = True
-
-            try:
-                annotations.extend(extractor.start(fname))
-            except fitz.FileDataError as e:
-                print(f"File structure errors for {file}.\n{e}")
-
-        if not found_pdf:
-            # have to remove curlys or papis logger gets upset
-            desc = re.sub("[{}]", "", papis.document.describe(doc))
-            logger.warning("Did not find suitable PDF file for document: " f"{desc}")
-        output.append(AnnotatedDocument(doc, annotations))
-    return output
-
-
-def _is_file_processable(fname: Path) -> bool:
-    if not fname.is_file():
-        logger.error(f"File {str(fname)} not readable.")
-        return False
-    if not is_pdf(fname):
-        return False
-    return True

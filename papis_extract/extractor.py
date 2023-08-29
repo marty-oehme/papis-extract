@@ -1,17 +1,51 @@
+import re
 from pathlib import Path
 from typing import Any, Optional
 
 import Levenshtein
+import magic
 import fitz_new as fitz
 import papis.logging
 import papis.config
+import papis.document
+from papis.document import Document
 
-from papis_extract.annotation_data import Annotation
+from papis_extract.annotation_data import Annotation, AnnotatedDocument
 
 logger = papis.logging.get_logger(__name__)
 
+def start(
+    documents: list[Document],
+) -> list[AnnotatedDocument]:
+    """Extract all annotations from passed documents.
 
-def start(filename: Path) -> list[Annotation]:
+    Returns all annotations contained in the papis 
+    documents passed in.
+    """
+
+    output: list[AnnotatedDocument] = []
+    for doc in documents:
+        annotations: list[Annotation] = []
+        found_pdf: bool = False
+        for file in doc.get_files():
+            fname = Path(file)
+            if not _is_file_processable(fname):
+                break
+            found_pdf = True
+
+            try:
+                annotations.extend(extract(fname))
+            except fitz.FileDataError as e:
+                print(f"File structure errors for {file}.\n{e}")
+
+        if not found_pdf:
+            # have to remove curlys or papis logger gets upset
+            desc = re.sub("[{}]", "", papis.document.describe(doc))
+            logger.warning("Did not find suitable PDF file for document: " f"{desc}")
+        output.append(AnnotatedDocument(doc, annotations))
+    return output
+
+def extract(filename: Path) -> list[Annotation]:
     """Extract annotations from a file.
 
     Returns all readable annotations contained in the file
@@ -40,6 +74,20 @@ def start(filename: Path) -> list[Annotation]:
     )
     return annotations
 
+
+def is_pdf(fname: Path) -> bool:
+    return magic.from_file(fname, mime=True) == "application/pdf"
+
+
+
+
+def _is_file_processable(fname: Path) -> bool:
+    if not fname.is_file():
+        logger.error(f"File {str(fname)} not readable.")
+        return False
+    if not is_pdf(fname):
+        return False
+    return True
 
 def _tag_from_colorname(colorname: str) -> str:
     color_mapping: dict[str, str] = getdict("tags", "plugins.extract")
