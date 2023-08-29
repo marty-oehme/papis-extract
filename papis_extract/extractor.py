@@ -42,7 +42,7 @@ def start(filename: Path) -> list[Annotation]:
 
 
 def _tag_from_colorname(colorname: str) -> str:
-    color_mapping: dict[str,str] = getdict("tags", "plugins.extract")
+    color_mapping: dict[str, str] = getdict("tags", "plugins.extract")
     if not color_mapping:
         return ""
 
@@ -82,6 +82,7 @@ def _retrieve_annotation_content(
     # just a highlight without any text
     return (None, None)
 
+
 # mimics the functions in papis.config.{getlist,getint,getfloat} etc.
 def getdict(key: str, section: Optional[str] = None) -> dict[str, str]:
     """Dict getter
@@ -97,13 +98,14 @@ def getdict(key: str, section: Optional[str] = None) -> dict[str, str]:
         rawvalue = eval(rawvalue)
     except Exception:
         raise SyntaxError(
-            "The key '{}' must be a valid Python object: {}"
-            .format(key, rawvalue))
+            "The key '{}' must be a valid Python object: {}".format(key, rawvalue)
+        )
     else:
         if not isinstance(rawvalue, dict):
             raise SyntaxError(
-                "The key '{}' must be a valid Python dict. Got: {} (type {!r})"
-                .format(key, rawvalue, type(rawvalue).__name__))
+                "The key '{}' must be a valid Python dict. Got: {} (type {!r})".format(
+                    key, rawvalue, type(rawvalue).__name__
+                )
+            )
 
         return rawvalue
-

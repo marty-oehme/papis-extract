@@ -1,0 +1,10 @@
+branches: master
+
+pipeline:
+  pytest:
+    image: ghcr.io/withlogicco/poetry:1.5.1
+    commands:
+      - poetry install
+      - python --version && poetry --version
+      - echo "------------- running pytest -------------"
+      - poetry run pytest

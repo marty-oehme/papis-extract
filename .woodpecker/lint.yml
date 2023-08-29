@@ -1,0 +1,16 @@
+pipeline:
+  lint_ruff:
+    image: python
+    commands:
+      - pip install ruff
+      - python --version && poetry --version && ruff --version
+      - echo "----------------- running ruff lint ------------------"
+      - ruff check .
+
+  lint_black:
+    image: python
+    commands:
+      - pip install black
+      - python --version && poetry --version && black --version
+      - echo "----------------- running black lint ----------------"
+      - black --check .

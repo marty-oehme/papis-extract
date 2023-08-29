@@ -1,8 +1,8 @@
 # papis-extract
 
-<!-- TODO have to set up status and badge
-[![status-badge](https://ci.martyoeh.me/api/badges/Marty/pubs-extract/status.svg)](https://ci.martyoeh.me/Marty/pubs-extract)
-![PyPI](https://img.shields.io/pypi/v/pubs-extract)
+[![status-badge](https://ci.martyoeh.me/api/badges/Marty/papis-extract/status.svg)](https://ci.martyoeh.me/Marty/papis-extract)
+<!-- TODO have to set up pypi badge
+![PyPI](https://img.shields.io/pypi/v/papis-extract)
 -->
 
 Quickly extract annotations from your pdf files with the help of the [papis](https://github.com/papis/papis) bibliography manager.\
@@ -11,10 +11,13 @@ Easily organize all your highlights and thoughts next to your documents and refe
 ## Installation:
 
 <!-- TODO set up pypi repository / explain git install path -->
-You can install from pypi with `pip install git+`.
+You can install from pypi with `pip install git+https://git.martyoeh.me/Marty/papis-extract.git`.
 
 That's it! If you have papis and papis-extract installed in the same environment (whether virtual or global),
 everything should now be set up.
+
+I am currently working towards the first release for pypi, see the below roadmap;
+when that is done you will also be able to install in the usual pypi way.
 
 To check if everything is working you should now see the `extract` command listed when running `papis --help`.
 You will be set up with the default options but if you want to change anything, read on in configuration below.
@@ -166,27 +169,46 @@ The option should generally not take too much tuning, but it is there if you nee
 
 This should generally be an alright default but is here to be changed for example if you work with a lot of different annotation colors (where dark purple and light purple may different meanings) and get false positives in automatic tag recognition, or no tags are recognized at all.
 
-## Roadmap
+## Roadmap to first release
 
 Known issues to be fixed:
 
 - [x] if both content and text are empty, do not extract an annotation
 - [x] Speed?
     - should be fine, on my machine (old i5 laptop) it takes around 90s for ~1000 documents with ~4000 annotations
-- [ ] ensure all cmdline options do what they should
+- [x] ensure all cmdline options do what they should
+- [ ] annotations carry over color object from fitz, should just be Color object or simple tuple with rgb vals
+- [ ] docstrings, docstrings!
+- [ ] testing testing testing!!
+    - [ ] refactor into some better abstractions (e.g. Exporter Protocol -> stdout/markdown implementations; Extractor Protocol -> PDF implementation)
 
 features to be implemented:
 
-- [ ] on_add hook to extract annotations as files are added
+- [ ] CICD
+    - [x] static analysis (lint, typecheck etc) on pushes
+    - [x] test pipeline on master pushes
+    - [ ] release pipeline to pypi on tags
 - [ ] add page number if available
+    - exists in Annotation, just need to place in output
 - [ ] show overall amount of extractions at the end
 - [ ] custom formatting decided by user
+    - in config as { "myformatter": ">{tag}\n{quote}\n{note}\n{page} etc"}
 - [ ] improved default exporters
     - markdown into notes
     - pretty display on stdout (rich?)
     - csv/tsv to stdout
     - table fmt stdout?
-- [ ] arbitrary color -> name settings not dependent on color name existing
+- [ ] allow custom colors -> tag name settings not dependent on color name existing (e.g. {"important": (1.0,0.0,0.0)})
+- [ ] `--overwrite` mode where existing annotations are not dropped but overwritten on same line of note
+- [ ] `--force` mode where we simply do not drop anything
+- [ ] `--format` option to choose from default or set up a custom formatter
+- [ ] on_add hook to extract annotations as files are added
+    - needs upstream help, 'on_add' hook, and pass-through of affected documents
+
+upstream changes:
+
+- [ ] need a hook for adding a document/file
+- [ ] need hooks to actually pass through information on the thing they worked on (i.e. their document)
 
 ## Issues
 
