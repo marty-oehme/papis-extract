@@ -1,5 +1,6 @@
 import math
 from dataclasses import dataclass, field
+from typing import Protocol
 
 import papis.config
 from papis.document import Document
@@ -55,9 +56,7 @@ class Annotation:
         Finds the closest named color to the annotation and returns it,
         using euclidian distance between the two color vectors.
         """
-        annot_colors = (
-            self.colors or (0.0, 0.0, 0.0)
-        )
+        annot_colors = self.colors or (0.0, 0.0, 0.0)
         nearest = None
         minimum_similarity = (
             papis.config.getfloat("minimum_similarity_color", "plugins.extract") or 1.0
@@ -85,3 +84,17 @@ class Annotation:
 class AnnotatedDocument:
     document: Document
     annotations: list[Annotation]
+
+
+@dataclass
+class Templating(Protocol):
+    string: str
+
+
+@dataclass
+class Markdown:
+    string: str = (
+        "{{#tag}}#{{tag}}\n{{/tag}}"
+        "{{#quote}}> {{quote}}{{/quote}} {{#page}}[p. {{page}}]{{/page}}\n"
+        "{{#note}}  NOTE: {{note}}{{/note}}"
+    )

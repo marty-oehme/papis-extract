@@ -7,17 +7,12 @@ import papis.git
 import papis.config
 import Levenshtein
 
-from papis_extract.annotation_data import AnnotatedDocument, Annotation
+from papis_extract.annotation_data import AnnotatedDocument, Annotation, Templating
 
 logger = papis.logging.get_logger(__name__)
 
 
-def _format_annotation(annotation: Annotation) -> str:
-    note = f"NOTE: {annotation.content}" if annotation.content else ""
-    return f"> {annotation.text}\n  {note}"
-
-
-def to_stdout(annots: list[AnnotatedDocument]) -> None:
+def to_stdout(annots: list[AnnotatedDocument], template: Templating) -> None:
     """Pretty print annotations to stdout.
 
     Gives a nice human-readable representations of
@@ -27,6 +22,7 @@ def to_stdout(annots: list[AnnotatedDocument]) -> None:
     if not annots:
         return
 
+    last = annots[-1]
     for entry in annots:
         if not entry.annotations:
             continue
@@ -39,13 +35,15 @@ def to_stdout(annots: list[AnnotatedDocument]) -> None:
             f"{title_decoration}\n{papis.document.describe(entry.document)}\n{title_decoration}\n"
         )
         for a in entry.annotations:
-            print(_format_annotation(a))
+            print(a.format(template.string))
 
-        if entry != annots[-1]:
+        if entry != last:
             print("\n")
 
 
-def to_notes(annots: list[AnnotatedDocument], edit: bool, git: bool) -> None:
+def to_notes(
+    annots: list[AnnotatedDocument], template: Templating, edit: bool, git: bool
+) -> None:
     """Write annotations into document notes.
 
     Permanently writes the given annotations into notes
@@ -61,7 +59,7 @@ def to_notes(annots: list[AnnotatedDocument], edit: bool, git: bool) -> None:
 
         formatted_annotations: list[str] = []
         for a in entry.annotations:
-            formatted_annotations.append(_format_annotation(a))
+            formatted_annotations.append(a.format(template.string))
 
         _add_annots_to_note(entry.document, formatted_annotations)
 

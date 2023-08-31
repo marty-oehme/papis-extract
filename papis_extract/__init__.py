@@ -8,7 +8,7 @@ import papis.strings
 from papis.document import Document
 
 from papis_extract import extractor, exporter
-from papis_extract.annotation_data import AnnotatedDocument
+from papis_extract.annotation_data import AnnotatedDocument, Markdown
 
 logger = papis.logging.get_logger(__name__)
 
@@ -84,6 +84,6 @@ def run(
     doc_annotations: list[AnnotatedDocument] = extractor.start(documents)
 
     if write:
-        exporter.to_notes(doc_annotations, edit=edit, git=git)
+        exporter.to_notes(doc_annotations, Markdown(), edit=edit, git=git)
     else:
-        exporter.to_stdout(doc_annotations)
+        exporter.to_stdout(doc_annotations, Markdown())
