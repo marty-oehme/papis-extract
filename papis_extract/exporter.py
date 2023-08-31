@@ -7,7 +7,8 @@ import papis.git
 import papis.config
 import Levenshtein
 
-from papis_extract.annotation_data import AnnotatedDocument, Annotation, Templating
+from papis_extract.annotation_data import AnnotatedDocument
+from papis_extract.model.templating import Templating
 
 logger = papis.logging.get_logger(__name__)
 
