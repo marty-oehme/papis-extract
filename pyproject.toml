@@ -12,16 +12,18 @@ pymupdf = "^1.23.1"
 levenshtein = "^0.21.1"
 papis = "^0.13"
 click = "^8.1.7"
-whoosh = "^2.7.4"
+whoosh = { version = "^2.7.4", optional = true }
 python-magic = "^0.4.27"
 chevron = "^0.14.0"
 
-[tool.poetry.plugins."papis.command"]
-extract = "papis_extract:main"
-
+[tool.poetry.extras]
+whoosh = ["whoosh"]
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
+
+[tool.poetry.plugins."papis.command"]
+extract = "papis_extract:main"
 
 [build-system]
 requires = ["poetry-core"]
