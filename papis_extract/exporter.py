@@ -8,7 +8,7 @@ import papis.config
 import Levenshtein
 
 from papis_extract.annotation_data import AnnotatedDocument
-from papis_extract.model.templating import Templating
+from papis_extract.templating import Templating
 
 logger = papis.logging.get_logger(__name__)
 
@@ -36,7 +36,7 @@ def to_stdout(annots: list[AnnotatedDocument], template: Templating) -> None:
             f"{title_decoration}\n{papis.document.describe(entry.document)}\n{title_decoration}\n"
         )
         for a in entry.annotations:
-            print(a.format(template.string))
+            print(a.format(template))
 
         if entry != last:
             print("\n")
@@ -60,7 +60,7 @@ def to_notes(
 
         formatted_annotations: list[str] = []
         for a in entry.annotations:
-            formatted_annotations.append(a.format(template.string))
+            formatted_annotations.append(a.format(template))
 
         _add_annots_to_note(entry.document, formatted_annotations)
 

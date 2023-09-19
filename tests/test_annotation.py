@@ -1,17 +1,20 @@
 import pytest
 from papis_extract.annotation_data import Annotation
+from papis_extract.templating import Custom
 
 
 @pytest.mark.parametrize(
     "fmt_string,expected",
     [
-        ("{{quote}}", "I am the text value"),
+        (Custom(string="{{quote}}"), "I am the text value"),
         (
-            "> {{quote}}\n{{#note}}Note: {{note}}{{/note}}",
+            Custom(string="> {{quote}}\n{{#note}}Note: {{note}}{{/note}}"),
             "> I am the text value\nNote: Whereas I represent the note",
         ),
         (
-            "{{#note}}Note: {{note}}{{/note}}{{#page}}, p. {{page}}{{/page}}",
+            Custom(
+                string="{{#note}}Note: {{note}}{{/note}}{{#page}}, p. {{page}}{{/page}}"
+            ),
             "Note: Whereas I represent the note",
         ),
     ],
@@ -25,12 +28,12 @@ def test_formatting(fmt_string, expected):
 
     assert sut.format(fmt_string) == expected
 
+
 def test_colorname_matches_exact():
-    sut = Annotation(
-        "testfile", colors=(1.0,0.0,0.0), minimum_similarity_color=1.0
-    )
+    sut = Annotation("testfile", colors=(1.0, 0.0, 0.0), minimum_similarity_color=1.0)
     c_name = sut.colorname
     assert c_name == "red"
+
 
 # TODO inject closeness value instead of relying on default
 @pytest.mark.parametrize(
@@ -44,8 +47,6 @@ def test_colorname_matches_exact():
     ],
 )
 def test_matches_inexact_colorname(color_value):
-    sut = Annotation(
-        "testfile", colors=color_value, minimum_similarity_color=0.833
-    )
+    sut = Annotation("testfile", colors=color_value, minimum_similarity_color=0.833)
     c_name = sut.colorname
     assert c_name == "red"

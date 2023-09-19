@@ -9,7 +9,7 @@ from papis.document import Document
 
 from papis_extract import extractor, exporter
 from papis_extract.annotation_data import AnnotatedDocument
-from papis_extract.model.templating import Markdown
+from papis_extract.templating import Markdown
 
 logger = papis.logging.get_logger(__name__)
 

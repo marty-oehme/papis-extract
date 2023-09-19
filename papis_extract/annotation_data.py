@@ -1,10 +1,11 @@
 import math
 from dataclasses import dataclass, field
-from typing import Protocol
 
 import papis.config
 from papis.document import Document
 import chevron
+
+from papis_extract.templating import Templating
 
 TEXT_SIMILARITY_MINIMUM = 0.75
 COLOR_SIMILARITY_MINIMUM = 0.833
@@ -32,7 +33,7 @@ class Annotation:
     type: str = "Highlight"
     minimum_similarity_color: float = 1.0
 
-    def format(self, formatting):
+    def format(self, template: Templating):
         """Return a formatted string of the annotation.
 
         Given a provided formatting pattern, this method returns the annotation
@@ -47,7 +48,7 @@ class Annotation:
             "tag": self.tag,
             "type": self.type,
         }
-        return chevron.render(formatting, data)
+        return chevron.render(template.string, data)
 
     @property
     def colorname(self):
