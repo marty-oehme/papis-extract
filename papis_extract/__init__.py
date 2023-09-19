@@ -9,7 +9,7 @@ from papis.document import Document
 
 from papis_extract import extractor, exporter
 from papis_extract.annotation_data import AnnotatedDocument
-from papis_extract.templating import Markdown
+from papis_extract.templating import Csv, Markdown, Templating
 
 logger = papis.logging.get_logger(__name__)
 
@@ -29,17 +29,24 @@ papis.config.register_default_settings(DEFAULT_OPTIONS)
 @click.help_option("-h", "--help")
 @papis.cli.query_argument()
 @papis.cli.doc_folder_option()
-@papis.cli.git_option(help="Add changes made to the notes files")
+@papis.cli.git_option(help="Commit changes made to the notes files.")
 @papis.cli.all_option()
-@click.option(
-    "--manual/--no-manual",
-    "-m",
-    help="Open each note in editor for manual editing after extracting its annotations",
-)
 @click.option(
     "--write/--no-write",
     "-w",
-    help="Do not write annotations to notes only print results to stdout",
+    help="Do not write annotations to notes only print results to stdout.",
+)
+@click.option(
+    "--manual/--no-manual",
+    "-m",
+    help=
+    "Open each note in editor for manual editing after extracting its annotations.",
+)
+@click.option(
+    "--template",
+    "-t",
+    type=click.Choice(["markdown", "csv"], case_sensitive=False),
+    help="Choose an output template to format annotations with.",
 )
 def main(
     query: str,
@@ -53,17 +60,19 @@ def main(
     doc_folder: str,
     manual: bool,
     write: bool,
+    template: str,
     git: bool,
 ) -> None:
-    """Extract annotations from any pdf document
+    """Extract annotations from any pdf document.
 
     The extract plugin allows manual or automatic extraction of all annotations
-    contained in the pdf documents belonging to entries of the pubs library.
+    contained in the pdf documents belonging to entries of the papis library.
     It can write those changes to stdout or directly create and update notes
     for papis documents.
 
     It adds a `papis extract` subcommand through which it is invoked, but can
-    optionally run whenever a new document is imported for a pubs entry.
+    optionally run whenever a new document is imported for a papis entry,
+    if set in the plugin configuration.
     """
     documents = papis.cli.handle_doc_folder_query_all_sort(
         query, doc_folder, sort_field=None, sort_reverse=False, _all=_all
@@ -72,7 +81,12 @@ def main(
         logger.warning(papis.strings.no_documents_retrieved_message)
         return
 
-    run(documents, edit=manual, write=write, git=git)
+    if template == "csv":
+        template_type = Csv()
+    else:
+        template_type = Markdown()
+
+    run(documents, edit=manual, write=write, git=git, template=template_type)
 
 
 def run(
@@ -80,11 +94,11 @@ def run(
     edit: bool = False,
     write: bool = False,
     git: bool = False,
+    template: Templating = Markdown(),
 ) -> None:
-
     doc_annotations: list[AnnotatedDocument] = extractor.start(documents)
 
     if write:
-        exporter.to_notes(doc_annotations, Markdown(), edit=edit, git=git)
+        exporter.to_notes(doc_annotations, template, edit=edit, git=git)
     else:
-        exporter.to_stdout(doc_annotations, Markdown())
+        exporter.to_stdout(doc_annotations, template)
