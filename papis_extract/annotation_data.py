@@ -5,8 +5,6 @@ import papis.config
 from papis.document import Document
 import chevron
 
-from papis_extract.templating import Templating
-
 TEXT_SIMILARITY_MINIMUM = 0.75
 COLOR_SIMILARITY_MINIMUM = 0.833
 
@@ -36,7 +34,7 @@ class Annotation:
     type: str = "Highlight"
     minimum_similarity_color: float = 1.0
 
-    def format(self, template: Templating):
+    def format(self, template: str, doc: Document = Document()):
         """Return a formatted string of the annotation.
 
         Given a provided formatting pattern, this method returns the annotation
@@ -50,8 +48,9 @@ class Annotation:
             "page": self.page,
             "tag": self.tag,
             "type": self.type,
+            "doc": doc,
         }
-        return chevron.render(template.string, data)
+        return chevron.render(template, data)
 
     @property
     def colorname(self):
@@ -89,6 +88,7 @@ class AnnotatedDocument:
     """Contains all annotations belonging to a single papis document.
 
     Combines a document with a list of annotations which belong to it."""
+
     document: Document
     annotations: list[Annotation]
 

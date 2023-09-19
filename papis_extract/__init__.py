@@ -8,8 +8,7 @@ import papis.strings
 from papis.document import Document
 
 from papis_extract import extractor, exporter
-from papis_extract.annotation_data import AnnotatedDocument
-from papis_extract.templating import Csv, Markdown, Templating
+from papis_extract.formatter import MarkdownFormatter, Formatter
 
 logger = papis.logging.get_logger(__name__)
 
@@ -39,8 +38,7 @@ papis.config.register_default_settings(DEFAULT_OPTIONS)
 @click.option(
     "--manual/--no-manual",
     "-m",
-    help=
-    "Open each note in editor for manual editing after extracting its annotations.",
+    help="Open note in editor for manual editing after annotation extraction.",
 )
 @click.option(
     "--template",
@@ -82,23 +80,19 @@ def main(
         return
 
     if template == "csv":
-        template_type = Csv()
-    else:
-        template_type = Markdown()
-
-    run(documents, edit=manual, write=write, git=git, template=template_type)
+        raise NotImplementedError
+    run(documents, edit=manual, write=write, git=git, template=MarkdownFormatter())
 
 
 def run(
     documents: list[Document],
+    template: Formatter,
     edit: bool = False,
     write: bool = False,
     git: bool = False,
-    template: Templating = Markdown(),
 ) -> None:
-    doc_annotations: list[AnnotatedDocument] = extractor.start(documents)
-
+    template.annotated_docs = extractor.start(documents)
     if write:
-        exporter.to_notes(doc_annotations, template, edit=edit, git=git)
+        exporter.to_notes(template, edit=edit, git=git)
     else:
-        exporter.to_stdout(doc_annotations, template)
+        exporter.to_stdout(template)

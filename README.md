@@ -177,8 +177,8 @@ Known issues to be fixed:
 - [x] Speed?
     - should be fine, on my machine (old i5 laptop) it takes around 90s for ~1000 documents with ~4000 annotations
 - [x] ensure all cmdline options do what they should
-- [ ] annotations carry over color object from fitz, should just be Color object or simple tuple with rgb vals
-- [ ] docstrings, docstrings!
+- [x] annotations carry over color object from fitz, should just be Color object or simple tuple with rgb vals
+- [x] docstrings, docstrings!
 - [ ] testing testing testing!!
     - [ ] refactor into some better abstractions (e.g. Exporter Protocol -> stdout/markdown implementations; Extractor Protocol -> PDF implementation)
 
@@ -188,7 +188,7 @@ features to be implemented:
     - [x] static analysis (lint, typecheck etc) on pushes
     - [x] test pipeline on master pushes
     - [ ] release pipeline to pypi on tags
-- [ ] add page number if available
+- [x] add page number if available
     - exists in Annotation, just need to place in output
 - [ ] show overall amount of extractions at the end
 - [ ] custom formatting decided by user
@@ -233,14 +233,18 @@ I am not sure if there is much I can do about these issues for now.
 and for myself whenever I forget. The basic building blocks currently in here are three:
 
 - extractors
-: extract data from a source file attached to a papis document.
+: Extract data from a source file attached to a papis document.
+
+- annotations
+: The actual extracted blocks of text, containing some metadata 
+  info as well, such as their color, type, page.
 
 - exporters
-: put the extracted data somewhere like stdout or into your notes.
+: Put the extracted data somewhere. For now stdout or into your notes.
 
-- templates
-: make sure the exporter saves the data according to your preferred layout, 
-such as a markdown syntax or csv-structure.
+- formatters
+: Make sure the exporter saves the data according to your preferred layout,
+  such as a markdown syntax or csv-structure.
 
 Splitting it into those three building blocks makes it easier to recombine them in any way,
 should someone want to save highlights as csv data in their notes, 

@@ -7,62 +7,34 @@ import papis.git
 import papis.config
 import Levenshtein
 
-from papis_extract.annotation_data import AnnotatedDocument
-from papis_extract.templating import Templating
+from papis_extract.formatter import Formatter
 
 logger = papis.logging.get_logger(__name__)
 
 
-def to_stdout(annots: list[AnnotatedDocument], template: Templating) -> None:
+def to_stdout(template: Formatter) -> None:
     """Pretty print annotations to stdout.
 
     Gives a nice human-readable representations of
     the annotations in somewhat of a list form.
     Not intended for machine-readability.
     """
-    if not annots:
-        return
-
-    last = annots[-1]
-    for entry in annots:
-        if not entry.annotations:
-            continue
-
-        title_decoration = (
-            f"{'=' * len(entry.document.get('title', ''))}   "
-            f"{'-' * len(entry.document.get('author', ''))}"
-        )
-        print(
-            f"{title_decoration}\n{papis.document.describe(entry.document)}\n{title_decoration}\n"
-        )
-        for a in entry.annotations:
-            print(a.format(template))
-
-        if entry != last:
-            print("\n")
+    output:str = template.execute()
+    print(output.rstrip('\n'))
 
 
-def to_notes(
-    annots: list[AnnotatedDocument], template: Templating, edit: bool, git: bool
-) -> None:
+def to_notes(template: Formatter, edit: bool, git: bool) -> None:
     """Write annotations into document notes.
 
     Permanently writes the given annotations into notes
     belonging to papis documents. Creates new notes for
     documents missing a note field or appends to existing.
     """
-    if not annots:
-        return
-
-    for entry in annots:
-        if not entry.annotations:
-            continue
-
-        formatted_annotations: list[str] = []
-        for a in entry.annotations:
-            formatted_annotations.append(a.format(template))
-
-        _add_annots_to_note(entry.document, formatted_annotations)
+    annotated_docs = template.annotated_docs
+    for entry in annotated_docs:
+        formatted_annotations = template.execute(entry).split("\n")
+        if formatted_annotations:
+            _add_annots_to_note(entry.document, formatted_annotations)
 
         if edit:
             papis.commands.edit.edit_notes(entry.document, git=git)
@@ -117,7 +89,7 @@ def _drop_existing_annotations(
 ) -> list[str]:
     """Returns the input annotations dropping any existing.
 
-    Takes a list of formatted annotations and a list of strings 
+    Takes a list of formatted annotations and a list of strings
     (most probably existing lines in a file). If anny annotations
     match an existing line closely enough, they will be dropped.
 
@@ -130,7 +102,9 @@ def _drop_existing_annotations(
     remaining: list[str] = []
     for an in formatted_annotations:
         an_split = an.splitlines()
-        if not _test_similarity(an_split[0], file_lines, minimum_similarity):
+        if an_split and not _test_similarity(
+            an_split[0], file_lines, minimum_similarity
+        ):
             remaining.append(an)
 
     return remaining
