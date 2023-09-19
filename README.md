@@ -96,7 +96,7 @@ in fact you can use the plugin without having to set up any of it if you are hap
 
 The full default settings look as follows:
 
-```yaml
+```conf
 [plugins.extract]
 on_import: False
 tags = {"important": "red", "toread": "blue"}
@@ -107,7 +107,7 @@ minimum_similarity_color = 0.833  # for matching tag to color
 
 ### Automatic extraction
 
-```yaml
+```conf
 [plugins.extract]
 on_import: True
 ```
@@ -119,7 +119,7 @@ if `False` extraction only happens when you explicitly invoke it.
 Extraction will *not* happen automatically when you add new annotations to an existing document,
 regardless of this setting.
 
-#### Automatic tagging
+### Automatic tagging
 
 By supplying the tags option with a valid python dictionary of the form `{"tag": "color", "tag2": "color2"}`, 
 you can enable automatic tagging for your annotations.
@@ -128,7 +128,7 @@ You thus ascribe specific meanings to the colors you use in highlighting.
 
 For example, if you always highlight the most essential arguments and findings in red and always highlight things you have to follow up on in blue, you can assign the meanings 'important' and 'todo' to them respectively as follows:
 
-```yaml
+```conf
 [plugins.extract]
 tags = {"red": "important", "blue": "toread"}
 ```
@@ -140,7 +140,7 @@ no defaults are set here.
 
 ### Advanced configuration
 
-```yaml
+```conf
 [plugins.extract]
 minimum_similarity: 0.75,  # for checking against existing annotations
 minimum_similarity_content: 0.9,  # for checking if highlight or note
@@ -219,12 +219,32 @@ This plugin makes an effort to find the right combination and extract the writte
 as well as any additional notes made - but things *will* slip through or extract weirdly every now
 and again.
 
-The easiest extraction is provided if your program writes the selection itself into the highlight
-content, because then we can just use that. It is harder to parse if it does not and will sometimes
-get additional words in front or behind (especially if the highlight ends in the middle of a line)
-or even cut a few off.
+Secondly, a note on the pages: I use the page number that the mupdf library gives me when it 
+extracts anything from the pdf file. Sometimes that number will be correct for the document,
+sometimes it will however be the number of the *pdf document* internally. This can happen if
+e.g. an article or a book has frontmatter without numbering scheme or with a different one.
+Sometimes the correct pages will still be embedded in the pdf and everything will work, 
+others it won't. So always double check your page numbers!
 
-I am not sure if there is much I can do about this.
+I am not sure if there is much I can do about these issues for now.
+
+## For developers
+
+and for myself whenever I forget. The basic building blocks currently in here are three:
+
+- extractors
+: extract data from a source file attached to a papis document.
+
+- exporters
+: put the extracted data somewhere like stdout or into your notes.
+
+- templates
+: make sure the exporter saves the data according to your preferred layout, 
+such as a markdown syntax or csv-structure.
+
+Splitting it into those three building blocks makes it easier to recombine them in any way,
+should someone want to save highlights as csv data in their notes, 
+or should we ever include more extractors than the one for PDFs.
 
 ---
 
