@@ -115,6 +115,14 @@ def _add_annots_to_note(
 def _drop_existing_annotations(
     formatted_annotations: list[str], file_lines: list[str]
 ) -> list[str]:
+    """Returns the input annotations dropping any existing.
+
+    Takes a list of formatted annotations and a list of strings 
+    (most probably existing lines in a file). If anny annotations
+    match an existing line closely enough, they will be dropped.
+
+    Returns list of annotations without duplicates.
+    """
     minimum_similarity = (
         papis.config.getfloat("minimum_similarity", "plugins.extract") or 1.0
     )

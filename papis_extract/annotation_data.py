@@ -22,7 +22,10 @@ COLORS = {
 
 @dataclass
 class Annotation:
-    """A PDF annotation object"""
+    """A PDF annotation object.
+
+    Contains all information necessary for the annotation itself, content and metadata.
+    """
 
     file: str
     colors: tuple[float, float, float] = field(default_factory=lambda: (0.0, 0.0, 0.0))
@@ -83,6 +86,10 @@ class Annotation:
 
 @dataclass
 class AnnotatedDocument:
+    """Contains all annotations belonging to a single papis document.
+
+    Combines a document with a list of annotations which belong to it."""
     document: Document
     annotations: list[Annotation]
 
+    # TODO could implement a from_doc() static method to generate annotation list?

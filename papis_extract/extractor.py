@@ -83,6 +83,7 @@ def extract(filename: Path) -> list[Annotation]:
 
 
 def is_pdf(fname: Path) -> bool:
+    """Check if file is a pdf, using mime type."""
     return magic.from_file(fname, mime=True) == "application/pdf"
 
 
