@@ -53,12 +53,9 @@ papis.config.register_default_settings(DEFAULT_OPTIONS)
 )
 def main(
     query: str,
-    # info: bool,
     # _papis_id: bool,
     # _file: bool,
-    # notes: bool,
     # _dir: bool,
-    # _format: str,
     _all: bool,
     doc_folder: str,
     manual: bool,

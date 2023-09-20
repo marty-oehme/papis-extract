@@ -11,7 +11,7 @@ Easily organize all your highlights and thoughts next to your documents and refe
 ## Installation:
 
 <!-- TODO set up pypi repository / explain git install path -->
-You can install from pypi with `pip install git+https://git.martyoeh.me/Marty/papis-extract.git`.
+You can install through pip with `pip install git+https://git.martyoeh.me/Marty/papis-extract.git`.
 
 That's it! If you have papis and papis-extract installed in the same environment (whether virtual or global),
 everything should now be set up.
@@ -86,6 +86,30 @@ While I have not done extensive optimizations the process should be relatively q
 On my current laptop, extracting ~4000 annotations from ~1000 library documents takes around 90 seconds,
 though this will vary with the length and size of the PDFs you have.
 For smaller workloads the process should be almost instant.
+
+You can change the format that you want your annotations in with the `--template` option.
+To output annotations in a markdown-compatible syntax (the default), do:
+
+```bash
+papis extract --template markdown
+```
+
+To instead see them in a csv syntax simply invoke:
+
+```bash
+papis extract --template csv
+```
+
+And if you only want to know how many annotations exist in the documents, you can invoke:
+
+```bash
+papis extract --template count
+```
+
+For now, these are the only formatters the plugin knows about.
+
+Be aware that if you write to your notes using a different template the plugin will *not* detect old annotations and drop them,
+so you will be doubling up your annotations.
 
 ## Configuration
 
@@ -181,6 +205,8 @@ Known issues to be fixed:
 - [x] docstrings, docstrings!
 - [ ] testing testing testing!!
     - [ ] refactor into some better abstractions (e.g. Exporter Protocol -> stdout/markdown implementations; Extractor Protocol -> PDF implementation)
+- [ ] dependency injection for extractor/exporter/formatter/annotation modules
+    - [ ] any call to papis.config should start from init and be injected?
 
 features to be implemented:
 
