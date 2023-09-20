@@ -8,7 +8,7 @@ import papis.strings
 from papis.document import Document
 
 from papis_extract import extractor, exporter
-from papis_extract.formatter import MarkdownFormatter, Formatter
+from papis_extract.formatter import CountFormatter, MarkdownFormatter, Formatter
 
 logger = papis.logging.get_logger(__name__)
 
@@ -43,7 +43,7 @@ papis.config.register_default_settings(DEFAULT_OPTIONS)
 @click.option(
     "--template",
     "-t",
-    type=click.Choice(["markdown", "csv"], case_sensitive=False),
+    type=click.Choice(["markdown", "count", "csv"], case_sensitive=False),
     help="Choose an output template to format annotations with.",
 )
 def main(
@@ -81,7 +81,12 @@ def main(
 
     if template == "csv":
         raise NotImplementedError
-    run(documents, edit=manual, write=write, git=git, template=MarkdownFormatter())
+    elif template == "count":
+        formatter = CountFormatter()
+    else:
+        formatter = MarkdownFormatter()
+
+    run(documents, edit=manual, write=write, git=git, template=formatter)
 
 
 def run(
