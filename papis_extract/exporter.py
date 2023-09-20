@@ -12,27 +12,27 @@ from papis_extract.formatter import Formatter
 logger = papis.logging.get_logger(__name__)
 
 
-def to_stdout(template: Formatter) -> None:
+def to_stdout(formatter: Formatter) -> None:
     """Pretty print annotations to stdout.
 
     Gives a nice human-readable representations of
     the annotations in somewhat of a list form.
     Not intended for machine-readability.
     """
-    output:str = template.execute()
+    output:str = formatter.execute()
     print(output.rstrip('\n'))
 
 
-def to_notes(template: Formatter, edit: bool, git: bool) -> None:
+def to_notes(formatter: Formatter, edit: bool, git: bool) -> None:
     """Write annotations into document notes.
 
     Permanently writes the given annotations into notes
     belonging to papis documents. Creates new notes for
     documents missing a note field or appends to existing.
     """
-    annotated_docs = template.annotated_docs
+    annotated_docs = formatter.annotated_docs
     for entry in annotated_docs:
-        formatted_annotations = template.execute(entry).split("\n")
+        formatted_annotations = formatter.execute(entry).split("\n")
         if formatted_annotations:
             _add_annots_to_note(entry.document, formatted_annotations)
 

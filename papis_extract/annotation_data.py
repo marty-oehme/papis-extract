@@ -34,7 +34,7 @@ class Annotation:
     type: str = "Highlight"
     minimum_similarity_color: float = 1.0
 
-    def format(self, template: str, doc: Document = Document()):
+    def format(self, formatting: str, doc: Document = Document()):
         """Return a formatted string of the annotation.
 
         Given a provided formatting pattern, this method returns the annotation
@@ -50,7 +50,7 @@ class Annotation:
             "type": self.type,
             "doc": doc,
         }
-        return chevron.render(template, data)
+        return chevron.render(formatting, data)
 
     @property
     def colorname(self):

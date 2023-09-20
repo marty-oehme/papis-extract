@@ -73,7 +73,7 @@ class CountFormatter:
             d = entry.document
             output += (
                 f"{d['author'] if 'author' in d else ''}"
-                f"{' - ' if 'author' in d else ''}" # only put separator if author
+                f"{' - ' if 'author' in d else ''}"  # only put separator if author
                 f"{entry.document['title'] if 'title' in d else ''}: "
                 f"{count}\n"
             )
@@ -83,9 +83,27 @@ class CountFormatter:
 
 @dataclass
 class CsvFormatter:
-    header: str = "type, tag, page, quote, note, file"
-    string: str = "{{type}}, {{tag}}, {{page}}, {{quote}}, {{note}}, {{file}}"
+    annotated_docs: list[AnnotatedDocument] = field(default_factory=lambda: list())
+    header: str = "type,tag,page,quote,note,author,title,ref,file"
+    string: str = (
+        '{{type}},{{tag}},{{page}},"{{quote}}","{{note}}",'
+        '"{{doc.author}}","{{doc.title}}","{{doc.ref}}","{{file}}"'
+    )
     footer: str = ""
+
+    def execute(self, doc: AnnotatedDocument | None = None) -> str:
+        documents = self.annotated_docs if doc is None else [doc]
+        output = f"{self.header}\n"
+        for entry in documents:
+            if not entry.annotations:
+                continue
+
+            d = entry.document
+            for a in entry.annotations:
+                output += a.format(self.string, doc=d)
+                output += "\n"
+
+        return output
 
 
 @dataclass
