@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Protocol
 
-from papis_extract.annotation_data import AnnotatedDocument
+from papis_extract.annotation import AnnotatedDocument
 
 
 @dataclass

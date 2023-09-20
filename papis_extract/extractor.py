@@ -10,7 +10,7 @@ import papis.config
 import papis.document
 from papis.document import Document
 
-from papis_extract.annotation_data import Annotation, AnnotatedDocument
+from papis_extract.annotation import Annotation, AnnotatedDocument
 
 logger = papis.logging.get_logger(__name__)
 
