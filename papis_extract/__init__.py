@@ -8,12 +8,7 @@ import papis.strings
 from papis.document import Document
 
 from papis_extract import extractor, exporter
-from papis_extract.formatter import (
-    CountFormatter,
-    CsvFormatter,
-    MarkdownFormatter,
-    Formatter,
-)
+from papis_extract.formatter import Formatter, format_count, format_csv, format_markdown
 
 logger = papis.logging.get_logger(__name__)
 
@@ -82,11 +77,11 @@ def main(
         return
 
     if template == "csv":
-        formatter = CsvFormatter()
+        formatter = format_csv
     elif template == "count":
-        formatter = CountFormatter()
+        formatter = format_count
     else:
-        formatter = MarkdownFormatter()
+        formatter = format_markdown
 
     run(documents, edit=manual, write=write, git=git, formatter=formatter)
 
@@ -98,8 +93,10 @@ def run(
     write: bool = False,
     git: bool = False,
 ) -> None:
-    formatter.annotated_docs = extractor.start(documents)
+    annotated_docs = extractor.start(documents)
     if write:
-        exporter.to_notes(formatter, edit=edit, git=git)
+        exporter.to_notes(
+            formatter=formatter, annotated_docs=annotated_docs, edit=edit, git=git
+        )
     else:
-        exporter.to_stdout(formatter)
+        exporter.to_stdout(formatter=formatter, annotated_docs=annotated_docs)
