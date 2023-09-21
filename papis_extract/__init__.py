@@ -8,7 +8,10 @@ import papis.strings
 from papis.document import Document
 
 from papis_extract import extractor, exporter
-from papis_extract.formatter import Formatter, format_count, format_csv, format_markdown
+from papis_extract.formatter import (
+    Formatter,
+    formatters
+)
 
 logger = papis.logging.get_logger(__name__)
 
@@ -43,7 +46,10 @@ papis.config.register_default_settings(DEFAULT_OPTIONS)
 @click.option(
     "--template",
     "-t",
-    type=click.Choice(["markdown", "count", "csv"], case_sensitive=False),
+    type=click.Choice(
+        ["markdown", "markdown-setext", "markdown-atx", "count", "csv"],
+        case_sensitive=False,
+    ),
     help="Choose an output template to format annotations with.",
 )
 def main(
@@ -76,12 +82,7 @@ def main(
         logger.warning(papis.strings.no_documents_retrieved_message)
         return
 
-    if template == "csv":
-        formatter = format_csv
-    elif template == "count":
-        formatter = format_count
-    else:
-        formatter = format_markdown
+    formatter = formatters[template]
 
     run(documents, edit=manual, write=write, git=git, formatter=formatter)
 

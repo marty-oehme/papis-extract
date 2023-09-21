@@ -94,6 +94,9 @@ To output annotations in a markdown-compatible syntax (the default), do:
 papis extract --template markdown
 ```
 
+There are sub-variants of the formatter for atx-style headers, with `--template markdown-atx` (`# Headings`),
+or setext-style with `--template markdown-setext` (the default style).
+
 To instead see them in a csv syntax simply invoke:
 
 ```bash
@@ -227,7 +230,8 @@ features to be implemented:
 - [ ] allow custom colors -> tag name settings not dependent on color name existing (e.g. {"important": (1.0,0.0,0.0)})
 - [ ] `--overwrite` mode where existing annotations are not dropped but overwritten on same line of note
 - [ ] `--force` mode where we simply do not drop anything
-- [ ] `--format` option to choose from default or set up a custom formatter
+- [x] `--format` option to choose from default or set up a custom formatter 
+    - called `--template` in current implementation
 - [ ] on_add hook to extract annotations as files are added
     - needs upstream help, 'on_add' hook, and pass-through of affected documents
 

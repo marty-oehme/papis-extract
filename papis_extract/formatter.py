@@ -5,7 +5,9 @@ from papis_extract.annotation import AnnotatedDocument
 Formatter = Callable[[list[AnnotatedDocument]], str]
 
 
-def format_markdown(docs: list[AnnotatedDocument] = []) -> str:
+def format_markdown(
+    docs: list[AnnotatedDocument] = [], atx_headings: bool = False
+) -> str:
     template = (
         "{{#tag}}#{{tag}}\n{{/tag}}"
         "{{#quote}}> {{quote}}{{/quote}} {{#page}}[p. {{page}}]{{/page}}"
@@ -16,15 +18,16 @@ def format_markdown(docs: list[AnnotatedDocument] = []) -> str:
         if not entry.annotations:
             continue
 
-        title_decoration = (
-            f"{'=' * len(entry.document.get('title', ''))}   "
-            f"{'-' * len(entry.document.get('author', ''))}"
-        )
-        output += (
-            f"{title_decoration}\n"
-            f"{entry.document['title']} - {entry.document['author']}\n"
-            f"{title_decoration}\n\n"
-        )
+        heading = f"{entry.document['title']} - {entry.document['author']}\n"
+        if atx_headings:
+            output += f"# {heading}\n"
+        else:
+            title_decoration = (
+                f"{'=' * len(entry.document.get('title', ''))}   "
+                f"{'-' * len(entry.document.get('author', ''))}"
+            )
+            output += f"{title_decoration}\n" f"{heading}" f"{title_decoration}\n\n"
+
         for a in entry.annotations:
             output += a.format(template)
             output += "\n"
@@ -32,6 +35,14 @@ def format_markdown(docs: list[AnnotatedDocument] = []) -> str:
         output += "\n\n\n"
 
     return output
+
+
+def format_markdown_atx(docs: list[AnnotatedDocument] = []) -> str:
+    return format_markdown(docs, atx_headings=True)
+
+
+def format_markdown_setext(docs: list[AnnotatedDocument] = []) -> str:
+    return format_markdown(docs, atx_headings=False)
 
 
 def format_count(docs: list[AnnotatedDocument] = []) -> str:
@@ -72,3 +83,12 @@ def format_csv(docs: list[AnnotatedDocument] = []) -> str:
             output += "\n"
 
     return output
+
+
+formatters: dict[str, Formatter] = {
+    "count": format_count,
+    "csv": format_csv,
+    "markdown": format_markdown,
+    "markdown_atx": format_markdown_atx,
+    "markdown_setext": format_markdown_setext,
+}
