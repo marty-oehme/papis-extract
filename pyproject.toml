@@ -21,6 +21,7 @@ whoosh = ["whoosh"]
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
+coverage = "^7.3.1"
 
 [tool.poetry.plugins."papis.command"]
 extract = "papis_extract:main"
