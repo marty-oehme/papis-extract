@@ -10,8 +10,8 @@ def format_markdown(
 ) -> str:
     template = (
         "{{#tag}}#{{tag}}\n{{/tag}}"
-        "{{#quote}}> {{quote}}{{/quote}} {{#page}}[p. {{page}}]{{/page}}"
-        "\n{{#note}}  NOTE: {{note}}{{/note}}"
+        "{{#quote}}> {{quote}}{{/quote}}{{#page}} [p. {{page}}]{{/page}}"
+        "{{#note}}\n  NOTE: {{note}}{{/note}}"
     )
     output = ""
     for entry in docs:
@@ -30,11 +30,11 @@ def format_markdown(
 
         for a in entry.annotations:
             output += a.format(template)
-            output += "\n"
+            output += "\n\n"
 
         output += "\n\n\n"
 
-    return output
+    return output.rstrip()
 
 
 def format_markdown_atx(docs: list[AnnotatedDocument] = []) -> str:
@@ -63,7 +63,7 @@ def format_count(docs: list[AnnotatedDocument] = []) -> str:
             f"{count}\n"
         )
 
-    return output
+    return output.rstrip()
 
 
 def format_csv(docs: list[AnnotatedDocument] = []) -> str:
@@ -82,7 +82,7 @@ def format_csv(docs: list[AnnotatedDocument] = []) -> str:
             output += a.format(template, doc=d)
             output += "\n"
 
-    return output
+    return output.rstrip()
 
 
 formatters: dict[str, Formatter] = {
