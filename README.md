@@ -8,7 +8,7 @@
 Quickly extract annotations from your pdf files with the help of the [papis](https://github.com/papis/papis) bibliography manager.\
 Easily organize all your highlights and thoughts next to your documents and references.\
 
-## Installation:
+## Installation
 
 <!-- TODO set up pypi repository / explain git install path -->
 You can install through pip with `pip install git+https://git.martyoeh.me/Marty/papis-extract.git`.
@@ -24,7 +24,8 @@ You will be set up with the default options but if you want to change anything, 
 
 > **Note**
 > This plugin is still in fairly early development. It does what I need it to do, but if you have a meticulously organized library *please* make backups before doing any operation which could affect your notes, or make use of the papis-included git options.
-## Usage:
+
+## Usage
 
 `papis extract [OPTIONS] [QUERY]`
 
@@ -117,6 +118,7 @@ so you will be doubling up your annotations.
 ## Configuration
 
 ### Basic configuration
+
 Add `extract` plugin settings to your papis `config` file (usually `~/.config/papis/config`):
 You will rarely have to set everything explained in the next few paragraphs -
 in fact you can use the plugin without having to set up any of it if you are happy with the defaults.
@@ -148,10 +150,10 @@ regardless of this setting.
 
 ### Automatic tagging
 
-By supplying the tags option with a valid python dictionary of the form `{"tag": "color", "tag2": "color2"}`, 
+By supplying the tags option with a valid python dictionary of the form `{"tag": "color", "tag2": "color2"}`,
 you can enable automatic tagging for your annotations.
 
-You thus ascribe specific meanings to the colors you use in highlighting. 
+You thus ascribe specific meanings to the colors you use in highlighting.
 
 For example, if you always highlight the most essential arguments and findings in red and always highlight things you have to follow up on in blue, you can assign the meanings 'important' and 'todo' to them respectively as follows:
 
@@ -174,7 +176,7 @@ minimum_similarity_content: 0.9,  # for checking if highlight or note
 minimum_similarity_color: 0.833,  # for matching tag to color
 ```
 
-`minimum_similarity` sets the required similarity of an annotation with existing annotations in your notes to be dropped. 
+`minimum_similarity` sets the required similarity of an annotation with existing annotations in your notes to be dropped.
 Annotations you have in notes might change if you for example fix small spacing mistakes or a letter/punctuation that has been falsely recognized in the PDF or change similar things.
 Generally, this should be fine as it is but you should change this value if you either get new annotations dropped though they should be added (decrease the value) or annotations are added duplicating existing ones (increase the value).
 
@@ -230,7 +232,7 @@ features to be implemented:
 - [ ] allow custom colors -> tag name settings not dependent on color name existing (e.g. {"important": (1.0,0.0,0.0)})
 - [ ] `--overwrite` mode where existing annotations are not dropped but overwritten on same line of note
 - [ ] `--force` mode where we simply do not drop anything
-- [x] `--format` option to choose from default or set up a custom formatter 
+- [x] `--format` option to choose from default or set up a custom formatter
     - called `--template` in current implementation
 - [ ] on_add hook to extract annotations as files are added
     - needs upstream help, 'on_add' hook, and pass-through of affected documents
@@ -249,11 +251,11 @@ This plugin makes an effort to find the right combination and extract the writte
 as well as any additional notes made - but things *will* slip through or extract weirdly every now
 and again.
 
-Secondly, a note on the pages: I use the page number that the mupdf library gives me when it 
+Secondly, a note on the pages: I use the page number that the mupdf library gives me when it
 extracts anything from the pdf file. Sometimes that number will be correct for the document,
 sometimes it will however be the number of the *pdf document* internally. This can happen if
 e.g. an article or a book has frontmatter without numbering scheme or with a different one.
-Sometimes the correct pages will still be embedded in the pdf and everything will work, 
+Sometimes the correct pages will still be embedded in the pdf and everything will work,
 others it won't. So always double check your page numbers!
 
 I am not sure if there is much I can do about these issues for now.
@@ -266,7 +268,7 @@ and for myself whenever I forget. The basic building blocks currently in here ar
 : Extract data from a source file attached to a papis document.
 
 - annotations
-: The actual extracted blocks of text, containing some metadata 
+: The actual extracted blocks of text, containing some metadata
   info as well, such as their color, type, page.
 
 - exporters
@@ -277,7 +279,7 @@ and for myself whenever I forget. The basic building blocks currently in here ar
   such as a markdown syntax or csv-structure.
 
 Splitting it into those three building blocks makes it easier to recombine them in any way,
-should someone want to save highlights as csv data in their notes, 
+should someone want to save highlights as csv data in their notes,
 or should we ever include more extractors than the one for PDFs.
 
 ---
