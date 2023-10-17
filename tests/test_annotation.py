@@ -26,13 +26,14 @@ def test_formatting_replacements(fmt_string, expected):
 
     assert sut.format(fmt_string) == expected
 
+
 @pytest.mark.parametrize(
     "fmt_string,expected",
     [
         ("{{doc.title}}", "document-title"),
         ("{{doc.title}}-{{doc.author}}", "document-title-document-author"),
         ("{{quote}} ({{doc.author}})", "I am the text value (document-author)"),
-    ]
+    ],
 )
 def test_formatting_document_access(fmt_string, expected):
     sut = Annotation(
@@ -40,9 +41,10 @@ def test_formatting_document_access(fmt_string, expected):
         text="I am the text value",
         content="Whereas I represent the note",
     )
-    doc = Document(data= {"title": "document-title", "author": "document-author"})
+    doc = Document(data={"title": "document-title", "author": "document-author"})
 
     assert sut.format(fmt_string, doc=doc) == expected
+
 
 def test_colorname_matches_exact():
     sut = Annotation("testfile", colors=(1.0, 0.0, 0.0), minimum_similarity_color=1.0)

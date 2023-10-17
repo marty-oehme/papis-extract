@@ -67,7 +67,7 @@ def _add_annots_to_note(
     :type formatted_annotations: list[str]
     :param git: Flag indicating whether to commit changes to git, defaults to False.
     :type git: bool, optional
-    :param force:  Flag indicating whether to force adding annotations even if they 
+    :param force:  Flag indicating whether to force adding annotations even if they
         already exist, defaults to False.
     :type force: bool, optional
     """

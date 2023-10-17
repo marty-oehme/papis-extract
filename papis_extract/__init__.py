@@ -8,10 +8,7 @@ import papis.strings
 from papis.document import Document
 
 from papis_extract import extractor, exporter
-from papis_extract.formatter import (
-    Formatter,
-    formatters
-)
+from papis_extract.formatter import Formatter, formatters
 
 logger = papis.logging.get_logger(__name__)
 
@@ -104,7 +101,11 @@ def run(
     annotated_docs = extractor.start(documents)
     if write:
         exporter.to_notes(
-            formatter=formatter, annotated_docs=annotated_docs, edit=edit, git=git, force=force
+            formatter=formatter,
+            annotated_docs=annotated_docs,
+            edit=edit,
+            git=git,
+            force=force,
         )
     else:
         exporter.to_stdout(formatter=formatter, annotated_docs=annotated_docs)
