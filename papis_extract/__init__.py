@@ -52,6 +52,11 @@ papis.config.register_default_settings(DEFAULT_OPTIONS)
     ),
     help="Choose an output template to format annotations with.",
 )
+@click.option(
+    "--force/--no-force",
+    "-f",
+    help="Do not drop any annotations because they already exist.",
+)
 def main(
     query: str,
     # _papis_id: bool,
@@ -63,6 +68,7 @@ def main(
     write: bool,
     template: str,
     git: bool,
+    force: bool,
 ) -> None:
     """Extract annotations from any pdf document.
 
@@ -84,7 +90,7 @@ def main(
 
     formatter = formatters[template]
 
-    run(documents, edit=manual, write=write, git=git, formatter=formatter)
+    run(documents, edit=manual, write=write, git=git, formatter=formatter, force=force)
 
 
 def run(
@@ -93,11 +99,12 @@ def run(
     edit: bool = False,
     write: bool = False,
     git: bool = False,
+    force: bool = False,
 ) -> None:
     annotated_docs = extractor.start(documents)
     if write:
         exporter.to_notes(
-            formatter=formatter, annotated_docs=annotated_docs, edit=edit, git=git
+            formatter=formatter, annotated_docs=annotated_docs, edit=edit, git=git, force=force
         )
     else:
         exporter.to_stdout(formatter=formatter, annotated_docs=annotated_docs)

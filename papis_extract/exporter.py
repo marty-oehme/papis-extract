@@ -25,7 +25,11 @@ def to_stdout(formatter: Formatter, annotated_docs: list[AnnotatedDocument]) -> 
 
 
 def to_notes(
-    formatter: Formatter, annotated_docs: list[AnnotatedDocument], edit: bool, git: bool
+    formatter: Formatter,
+    annotated_docs: list[AnnotatedDocument],
+    edit: bool,
+    git: bool,
+    force: bool,
 ) -> None:
     """Write annotations into document notes.
 
@@ -36,7 +40,7 @@ def to_notes(
     for entry in annotated_docs:
         formatted_annotations = formatter([entry]).split("\n")
         if formatted_annotations:
-            _add_annots_to_note(entry.document, formatted_annotations)
+            _add_annots_to_note(entry.document, formatted_annotations, force=force)
 
         if edit:
             papis.commands.edit.edit_notes(entry.document, git=git)
@@ -46,11 +50,26 @@ def _add_annots_to_note(
     document: papis.document.Document,
     formatted_annotations: list[str],
     git: bool = False,
+    force: bool = False,
 ) -> None:
-    """Append new annotations to the end of a note.
+    """
+    Append new annotations to the end of a note.
 
-    Looks through note to determine any new annotations which should be
-    added and adds them to the end of the note file.
+    This function appends new annotations to the end of a note file. It takes in a
+    document object containing the note, a list of formatted annotations to be
+    added, and optional flags git and force. If git is True, the changes will be
+    committed to git. If force is True, the annotations will be added even if they
+    already exist in the note.
+
+    :param document: The document object representing the note
+    :type document: class:`papis.document.Document`
+    :param formatted_annotations: A list of already formatted annotations to be added
+    :type formatted_annotations: list[str]
+    :param git: Flag indicating whether to commit changes to git, defaults to False.
+    :type git: bool, optional
+    :param force:  Flag indicating whether to force adding annotations even if they 
+        already exist, defaults to False.
+    :type force: bool, optional
     """
     logger.debug("Adding annotations to note.")
     notes_path = papis.notes.notes_path_ensured(document)
@@ -59,9 +78,9 @@ def _add_annots_to_note(
     with open(notes_path, "r") as file_read:
         existing = file_read.readlines()
 
-    new_annotations: list[str] = _drop_existing_annotations(
-        formatted_annotations, existing
-    )
+    new_annotations: list[str] = []
+    if not force:
+        new_annotations = _drop_existing_annotations(formatted_annotations, existing)
     if not new_annotations:
         return
 
