@@ -1,6 +1,7 @@
-branches: main
+when:
+  branch: main
 
-pipeline:
+steps:
   pytest:
     image: ghcr.io/withlogicco/poetry:1.5.1
     commands:

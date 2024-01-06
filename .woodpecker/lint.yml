@@ -1,4 +1,4 @@
-pipeline:
+steps:
   lint_ruff:
     image: python
     commands:
