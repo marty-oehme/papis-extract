@@ -4,7 +4,7 @@ from typing import Any, Optional
 
 import Levenshtein
 import magic
-import fitz_new as fitz
+import fitz
 import papis.logging
 import papis.config
 import papis.document
