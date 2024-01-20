@@ -1,86 +1,96 @@
 from collections.abc import Callable
 
-from papis_extract.annotation import AnnotatedDocument
+from papis.document import Document
 
-Formatter = Callable[[list[AnnotatedDocument]], str]
+from papis_extract.annotation import Annotation
+
+Formatter = Callable[[Document, list[Annotation]], str]
 
 
 def format_markdown(
-    docs: list[AnnotatedDocument] = [], atx_headings: bool = False
+    document: Document = Document(),
+    annotations: list[Annotation] = [],
+    headings: str = "setext",  # setext | atx | None
 ) -> str:
+    if not annotations:
+        return ""
     template = (
         "{{#tag}}#{{tag}}\n{{/tag}}"
         "{{#quote}}> {{quote}}{{/quote}}{{#page}} [p. {{page}}]{{/page}}"
         "{{#note}}\n  NOTE: {{note}}{{/note}}"
     )
     output = ""
-    for entry in docs:
-        if not entry.annotations:
-            continue
 
-        heading = f"{entry.document['title']} - {entry.document['author']}\n"
-        if atx_headings:
-            output += f"# {heading}\n"
-        else:
-            title_decoration = (
-                f"{'=' * len(entry.document.get('title', ''))}   "
-                f"{'-' * len(entry.document.get('author', ''))}"
-            )
-            output += f"{title_decoration}\n" f"{heading}" f"{title_decoration}\n\n"
-
-        for a in entry.annotations:
-            output += a.format(template)
-            output += "\n\n"
-
-        output += "\n\n\n"
-
-    return output.rstrip()
-
-
-def format_markdown_atx(docs: list[AnnotatedDocument] = []) -> str:
-    return format_markdown(docs, atx_headings=True)
-
-
-def format_markdown_setext(docs: list[AnnotatedDocument] = []) -> str:
-    return format_markdown(docs, atx_headings=False)
-
-
-def format_count(docs: list[AnnotatedDocument] = []) -> str:
-    output = ""
-    for entry in docs:
-        if not entry.annotations:
-            continue
-
-        count = 0
-        for _ in entry.annotations:
-            count += 1
-
-        d = entry.document
-        output += (
-            f"{d['author'] if 'author' in d else ''}"
-            f"{' - ' if 'author' in d else ''}"  # only put separator if author
-            f"{entry.document['title'] if 'title' in d else ''}: "
-            f"{count}\n"
+    heading = f"{document.get('title', '')} - {document.get('author', '')}"
+    if headings == "atx":
+        output = f"# {heading}\n\n"
+    elif headings == "setext":
+        title_decoration = (
+            f"{'=' * len(document.get('title', ''))}   "
+            f"{'-' * len(document.get('author', ''))}"
         )
+        output = f"{title_decoration}\n{heading}\n{title_decoration}\n\n"
+    else:
+        output = ""
+
+    for a in annotations:
+        output += a.format(template)
+        output += "\n\n"
+
+    output += "\n\n\n"
 
     return output.rstrip()
 
 
-def format_csv(docs: list[AnnotatedDocument] = []) -> str:
+def format_markdown_atx(
+    document: Document = Document(),
+    annotations: list[Annotation] = [],
+) -> str:
+    return format_markdown(document, annotations, headings="atx")
+
+
+def format_markdown_setext(
+    document: Document = Document(),
+    annotations: list[Annotation] = [],
+) -> str:
+    return format_markdown(document, annotations, headings="setext")
+
+
+def format_count(
+    document: Document = Document(),
+    annotations: list[Annotation] = [],
+) -> str:
+    if not annotations:
+        return ""
+
+    count = 0
+    for _ in annotations:
+        count += 1
+
+    return (
+        f"{document.get('author', '')}"
+        f"{' - ' if 'author' in document else ''}"  # only put separator if author
+        f"{document.get('title', '')}: "
+        f"{count}\n"
+    ).rstrip()
+
+
+def format_csv(
+    document: Document = Document(),
+    annotations: list[Annotation] = [],
+) -> str:
     header: str = "type,tag,page,quote,note,author,title,ref,file"
     template: str = (
         '{{type}},{{tag}},{{page}},"{{quote}}","{{note}}",'
         '"{{doc.author}}","{{doc.title}}","{{doc.ref}}","{{file}}"'
     )
     output = f"{header}\n"
-    for entry in docs:
-        if not entry.annotations:
-            continue
+    if not annotations:
+        return ""
 
-        d = entry.document
-        for a in entry.annotations:
-            output += a.format(template, doc=d)
-            output += "\n"
+    for a in annotations:
+        output += a.format(template, doc=document)
+        output += "\n"
 
     return output.rstrip()
 
@@ -89,6 +99,6 @@ formatters: dict[str, Formatter] = {
     "count": format_count,
     "csv": format_csv,
     "markdown": format_markdown,
-    "markdown_atx": format_markdown_atx,
-    "markdown_setext": format_markdown_setext,
+    "markdown-atx": format_markdown_atx,
+    "markdown-setext": format_markdown_setext,
 }

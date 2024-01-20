@@ -6,27 +6,33 @@ import papis.api
 import papis.git
 import papis.config
 import Levenshtein
-from papis_extract.annotation import AnnotatedDocument
+from papis_extract.annotation import Annotation
 
 from papis_extract.formatter import Formatter
 
 logger = papis.logging.get_logger(__name__)
 
 
-def to_stdout(formatter: Formatter, annotated_docs: list[AnnotatedDocument]) -> None:
+def to_stdout(
+    formatter: Formatter,
+    document: papis.document.Document,
+    annotations: list[Annotation],
+) -> None:
     """Pretty print annotations to stdout.
 
     Gives a nice human-readable representations of
     the annotations in somewhat of a list form.
     Not intended for machine-readability.
     """
-    output: str = formatter(annotated_docs)
-    print(output.rstrip("\n"))
+    output: str = formatter(document, annotations)
+    if output:
+        print(output.rstrip("\n"))
 
 
 def to_notes(
     formatter: Formatter,
-    annotated_docs: list[AnnotatedDocument],
+    document: papis.document.Document,
+    annotations: list[Annotation],
     edit: bool,
     git: bool,
     force: bool,
@@ -37,13 +43,12 @@ def to_notes(
     belonging to papis documents. Creates new notes for
     documents missing a note field or appends to existing.
     """
-    for entry in annotated_docs:
-        formatted_annotations = formatter([entry]).split("\n")
-        if formatted_annotations:
-            _add_annots_to_note(entry.document, formatted_annotations, force=force)
+    formatted_annotations = formatter(document, annotations).split("\n")
+    if formatted_annotations:
+        _add_annots_to_note(document, formatted_annotations, force=force)
 
-        if edit:
-            papis.commands.edit.edit_notes(entry.document, git=git)
+    if edit:
+        papis.commands.edit.edit_notes(document, git=git)
 
 
 def _add_annots_to_note(

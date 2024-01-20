@@ -10,41 +10,39 @@ import papis.config
 import papis.document
 from papis.document import Document
 
-from papis_extract.annotation import Annotation, AnnotatedDocument
+from papis_extract.annotation import Annotation
 
 logger = papis.logging.get_logger(__name__)
 
 
 def start(
-    documents: list[Document],
-) -> list[AnnotatedDocument]:
+    document: Document,
+) -> list[Annotation]:
     """Extract all annotations from passed documents.
 
     Returns all annotations contained in the papis
     documents passed in.
     """
 
-    output: list[AnnotatedDocument] = []
-    for doc in documents:
-        annotations: list[Annotation] = []
-        found_pdf: bool = False
-        for file in doc.get_files():
-            fname = Path(file)
-            if not _is_file_processable(fname):
-                break
-            found_pdf = True
+    annotations: list[Annotation] = []
+    found_pdf: bool = False
+    for file in document.get_files():
+        fname = Path(file)
+        if not _is_file_processable(fname):
+            break
+        found_pdf = True
 
-            try:
-                annotations.extend(extract(fname))
-            except fitz.FileDataError as e:
-                print(f"File structure errors for {file}.\n{e}")
+        try:
+            annotations.extend(extract(fname))
+        except fitz.FileDataError as e:
+            print(f"File structure errors for {file}.\n{e}")
 
-        if not found_pdf:
-            # have to remove curlys or papis logger gets upset
-            desc = re.sub("[{}]", "", papis.document.describe(doc))
-            logger.warning("Did not find suitable PDF file for document: " f"{desc}")
-        output.append(AnnotatedDocument(doc, annotations))
-    return output
+    if not found_pdf:
+        # have to remove curlys or papis logger gets upset
+        desc = re.sub("[{}]", "", papis.document.describe(document))
+        logger.warning("Did not find suitable PDF file for document: " f"{desc}")
+
+    return annotations
 
 
 def extract(filename: Path) -> list[Annotation]:

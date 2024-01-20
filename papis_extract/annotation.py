@@ -81,15 +81,3 @@ class Annotation:
         difference between full black and full white, as a float.
         """
         return 1 - (abs(math.dist([*color_one], [*color_two])) / 3)
-
-
-@dataclass
-class AnnotatedDocument:
-    """Contains all annotations belonging to a single papis document.
-
-    Combines a document with a list of annotations which belong to it."""
-
-    document: Document
-    annotations: list[Annotation]
-
-    # TODO could implement a from_doc() static method to generate annotation list?

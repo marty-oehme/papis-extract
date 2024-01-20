@@ -7,7 +7,8 @@ import papis.notes
 import papis.strings
 from papis.document import Document
 
-from papis_extract import extractor, exporter
+from papis_extract import exporter, extractor
+from papis_extract.annotation import Annotation
 from papis_extract.formatter import Formatter, formatters
 
 logger = papis.logging.get_logger(__name__)
@@ -44,7 +45,7 @@ papis.config.register_default_settings(DEFAULT_OPTIONS)
     "--template",
     "-t",
     type=click.Choice(
-        ["markdown", "markdown-setext", "markdown-atx", "count", "csv"],
+        list(formatters.keys()),
         case_sensitive=False,
     ),
     help="Choose an output template to format annotations with.",
@@ -85,27 +86,34 @@ def main(
         logger.warning(papis.strings.no_documents_retrieved_message)
         return
 
-    formatter = formatters[template]
+    formatter = formatters.get(template)
 
     run(documents, edit=manual, write=write, git=git, formatter=formatter, force=force)
 
 
 def run(
     documents: list[Document],
-    formatter: Formatter,
+    formatter: Formatter | None,
     edit: bool = False,
     write: bool = False,
     git: bool = False,
     force: bool = False,
 ) -> None:
-    annotated_docs = extractor.start(documents)
-    if write:
-        exporter.to_notes(
-            formatter=formatter,
-            annotated_docs=annotated_docs,
-            edit=edit,
-            git=git,
-            force=force,
-        )
-    else:
-        exporter.to_stdout(formatter=formatter, annotated_docs=annotated_docs)
+    for doc in documents:
+        annotations: list[Annotation] = extractor.start(doc)
+
+        if write:
+            exporter.to_notes(
+                formatter=formatter or formatters["markdown-atx"],
+                document=doc,
+                annotations=annotations,
+                edit=edit,
+                git=git,
+                force=force,
+            )
+        else:
+            exporter.to_stdout(
+                formatter=formatter or formatters["markdown"],
+                document=doc,
+                annotations=annotations,
+            )
