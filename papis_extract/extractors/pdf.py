@@ -41,8 +41,8 @@ class PdfExtractor:
                     )
                     a = Annotation(
                         file=str(filename),
-                        text=quote or "",
-                        content=note or "",
+                        content=quote or "",
+                        note=note or "",
                         colors=col,
                         type=annot.type[1],
                         page=(page.number or 0) + 1,

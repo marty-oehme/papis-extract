@@ -28,9 +28,9 @@ class Annotation:
     file: str
     colors: tuple[float, float, float] = field(default_factory=lambda: (0.0, 0.0, 0.0))
     content: str = ""
+    note: str = ""
     page: int = 0
     tag: str = ""
-    text: str = ""
     type: str = "Highlight"
     minimum_similarity_color: float = 1.0
 
@@ -43,8 +43,8 @@ class Annotation:
         """
         data = {
             "file": self.file,
-            "quote": self.text,
-            "note": self.content,
+            "quote": self.content,
+            "note": self.note,
             "page": self.page,
             "tag": self.tag,
             "type": self.type,
