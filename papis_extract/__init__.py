@@ -8,6 +8,7 @@ import papis.strings
 from papis.document import Document
 
 from papis_extract import exporter, extraction
+from papis_extract.extractors import all_extractors
 from papis_extract.annotation import Annotation
 from papis_extract.formatter import Formatter, formatters
 
@@ -55,10 +56,10 @@ papis.config.register_default_settings(DEFAULT_OPTIONS)
     "-e",
     "extractors",
     type=click.Choice(
-        list(extraction.extractors.keys()),
+        list(all_extractors.keys()),
         case_sensitive=False,
     ),
-    default=list(extraction.extractors.keys()),
+    default=list(all_extractors.keys()),
     multiple=True,
     help="Choose an extractor to apply to the selected documents.",
 )
@@ -107,7 +108,7 @@ def main(
         write=write,
         git=git,
         formatter=formatter,
-        extractors=[extraction.extractors.get(e) for e in extractors],
+        extractors=[all_extractors.get(e) for e in extractors],
         force=force,
     )
 

@@ -9,7 +9,6 @@ import papis.logging
 from papis.document import Document
 
 from papis_extract.annotation import Annotation
-from papis_extract.extractors.pdf import PdfExtractor
 
 logger = papis.logging.get_logger(__name__)
 
@@ -51,8 +50,3 @@ def start(
         logger.warning("Did not find suitable file for document: " f"{desc}")
 
     return annotations
-
-
-extractors: dict[str, Extractor] = {
-    "pdf": PdfExtractor(),
-}
