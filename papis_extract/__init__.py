@@ -51,6 +51,18 @@ papis.config.register_default_settings(DEFAULT_OPTIONS)
     help="Choose an output template to format annotations with.",
 )
 @click.option(
+    "--extractor",
+    "-e",
+    "extractors",
+    type=click.Choice(
+        list(extractor.extractors.keys()),
+        case_sensitive=False,
+    ),
+    default=list(extractor.extractors.keys()),
+    multiple=True,
+    help="Choose an extractor to apply to the selected documents.",
+)
+@click.option(
     "--force/--no-force",
     "-f",
     help="Do not drop any annotations because they already exist.",
@@ -64,6 +76,7 @@ def main(
     doc_folder: str,
     manual: bool,
     write: bool,
+    extractors: str,
     template: str,
     git: bool,
     force: bool,
@@ -86,6 +99,7 @@ def main(
         logger.warning(papis.strings.no_documents_retrieved_message)
         return
 
+    print(extractors)
     formatter = formatters.get(template)
 
     run(documents, edit=manual, write=write, git=git, formatter=formatter, force=force)

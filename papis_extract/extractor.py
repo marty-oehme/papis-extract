@@ -34,23 +34,26 @@ def start(
     pdf_extractor: Extractor = PdfExtractor()
 
     annotations: list[Annotation] = []
-    found_pdf: bool = False
+    file_available: bool = False
     for file in document.get_files():
         fname = Path(file)
         if not pdf_extractor.can_process(fname):
-            break
-        found_pdf = True
+            continue
+        file_available = True
 
         try:
             annotations.extend(pdf_extractor.run(fname))
         except fitz.FileDataError as e:
             print(f"File structure errors for {file}.\n{e}")
 
-    if not found_pdf:
+    if not file_available:
         # have to remove curlys or papis logger gets upset
         desc = re.sub("[{}]", "", papis.document.describe(document))
-        logger.warning("Did not find suitable PDF file for document: " f"{desc}")
+        logger.warning("Did not find suitable file for document: " f"{desc}")
 
     return annotations
 
 
+extractors: dict[str, Extractor] = {
+    "pdf": PdfExtractor(),
+}
