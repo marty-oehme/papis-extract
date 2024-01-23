@@ -7,7 +7,7 @@ import papis.notes
 import papis.strings
 from papis.document import Document
 
-from papis_extract import exporter, extractor
+from papis_extract import exporter, extraction
 from papis_extract.annotation import Annotation
 from papis_extract.formatter import Formatter, formatters
 
@@ -55,10 +55,10 @@ papis.config.register_default_settings(DEFAULT_OPTIONS)
     "-e",
     "extractors",
     type=click.Choice(
-        list(extractor.extractors.keys()),
+        list(extraction.extractors.keys()),
         case_sensitive=False,
     ),
-    default=list(extractor.extractors.keys()),
+    default=list(extraction.extractors.keys()),
     multiple=True,
     help="Choose an extractor to apply to the selected documents.",
 )
@@ -76,7 +76,7 @@ def main(
     doc_folder: str,
     manual: bool,
     write: bool,
-    extractors: str,
+    extractors: list[str],
     template: str,
     git: bool,
     force: bool,
@@ -99,35 +99,46 @@ def main(
         logger.warning(papis.strings.no_documents_retrieved_message)
         return
 
-    print(extractors)
     formatter = formatters.get(template)
 
-    run(documents, edit=manual, write=write, git=git, formatter=formatter, force=force)
+    run(
+        documents,
+        edit=manual,
+        write=write,
+        git=git,
+        formatter=formatter,
+        extractors=[extraction.extractors.get(e) for e in extractors],
+        force=force,
+    )
 
 
 def run(
     documents: list[Document],
     formatter: Formatter | None,
+    extractors: list[extraction.Extractor | None],
     edit: bool = False,
     write: bool = False,
     git: bool = False,
     force: bool = False,
 ) -> None:
     for doc in documents:
-        annotations: list[Annotation] = extractor.start(doc)
+        for ext in extractors:
+            if not ext:
+                continue
 
-        if write:
-            exporter.to_notes(
-                formatter=formatter or formatters["markdown-atx"],
-                document=doc,
-                annotations=annotations,
-                edit=edit,
-                git=git,
-                force=force,
-            )
-        else:
-            exporter.to_stdout(
-                formatter=formatter or formatters["markdown"],
-                document=doc,
-                annotations=annotations,
-            )
+            annotations: list[Annotation] = extraction.start(ext, doc)
+            if write:
+                exporter.to_notes(
+                    formatter=formatter or formatters["markdown-atx"],
+                    document=doc,
+                    annotations=annotations,
+                    edit=edit,
+                    git=git,
+                    force=force,
+                )
+            else:
+                exporter.to_stdout(
+                    formatter=formatter or formatters["markdown"],
+                    document=doc,
+                    annotations=annotations,
+                )

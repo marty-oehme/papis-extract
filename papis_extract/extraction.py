@@ -23,6 +23,7 @@ class Extractor(Protocol):
 
 
 def start(
+    extractor: Extractor,
     document: Document,
 ) -> list[Annotation]:
     """Extract all annotations from passed documents.
@@ -30,19 +31,17 @@ def start(
     Returns all annotations contained in the papis
     documents passed in.
     """
-
-    pdf_extractor: Extractor = PdfExtractor()
-
     annotations: list[Annotation] = []
     file_available: bool = False
+
     for file in document.get_files():
         fname = Path(file)
-        if not pdf_extractor.can_process(fname):
+        if not extractor.can_process(fname):
             continue
         file_available = True
 
         try:
-            annotations.extend(pdf_extractor.run(fname))
+            annotations.extend(extractor.run(fname))
         except fitz.FileDataError as e:
             print(f"File structure errors for {file}.\n{e}")
 
