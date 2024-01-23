@@ -198,7 +198,7 @@ The option should generally not take too much tuning, but it is there if you nee
 
 This should generally be an alright default but is here to be changed for example if you work with a lot of different annotation colors (where dark purple and light purple may different meanings) and get false positives in automatic tag recognition, or no tags are recognized at all.
 
-## Roadmap to first release
+## TODO: Roadmap to first release
 
 Known issues to be fixed:
 
@@ -222,16 +222,18 @@ features to be implemented:
 - [x] add page number if available
     - exists in Annotation, just need to place in output
 - [ ] show overall amount of extractions at the end
+    - implemented for writing to notes (notes exporter)
+    - KNOWN ISSUE: currently returns number of annotation rows (may be multiple per annot)
 - [ ] custom formatting decided by user
     - in config as { "myformatter": ">{tag}\n{quote}\n{note}\n{page} etc"}
 - [ ] improved default exporters
-    - markdown into notes
-    - pretty display on stdout (rich?)
-    - csv/tsv to stdout
-    - table fmt stdout?
+    - [x] markdown into notes
+    - [ ] pretty display on stdout (rich?)
+    - [x] csv/tsv to stdout
+    - [ ] table fmt stdout?
 - [ ] allow custom colors -> tag name settings not dependent on color name existing (e.g. {"important": (1.0,0.0,0.0)})
 - [ ] `--overwrite` mode where existing annotations are not dropped but overwritten on same line of note
-- [ ] `--force` mode where we simply do not drop anything
+- [x] `--force` mode where we simply do not drop anything
 - [x] `--format` option to choose from default or set up a custom formatter
     - called `--template` in current implementation
 - [ ] on_add hook to extract annotations as files are added
@@ -281,6 +283,26 @@ and for myself whenever I forget. The basic building blocks currently in here ar
 Splitting it into those three building blocks makes it easier to recombine them in any way,
 should someone want to save highlights as csv data in their notes,
 or should we ever include more extractors than the one for PDFs.
+
+To develop it together with an isolated `papis` instance you can simply inject papis into your 
+development environment, e.g. invoking the poetry environment shell and then manually installing:
+
+```bash
+poetry shell
+pip install papis
+```
+
+This will leave you with `papis` installed in the same virtual environment as your development.
+However, what I do on my system instead to enable quick testing is inject it into a 
+system-wide (but isolated with `pipx`) papis setup:
+
+```bash
+pipx install papis # create an isolated papis installation reachable form anywhere
+pipx inject --editable papis . # inject this folder into the environment and keep up with any changes
+```
+
+This for me provides the ideal compromise of clean dev environment (papis is not directly part of it)
+but quickly reachable installation to test my changes.
 
 ---
 
