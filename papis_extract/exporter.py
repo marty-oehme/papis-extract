@@ -26,7 +26,7 @@ def to_stdout(
     """
     output: str = formatter(document, annotations)
     if output:
-        print(output.rstrip("\n"))
+        print("{output}\n".format(output=output.rstrip("\n")))
 
 
 def to_notes(
