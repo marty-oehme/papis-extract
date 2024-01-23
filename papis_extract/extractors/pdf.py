@@ -47,7 +47,6 @@ class PdfExtractor:
                         type=annot.type[1],
                         page=(page.number or 0) + 1,
                     )
-                    a.tag = self._tag_from_colorname(a.colorname or "")
                     annotations.append(a)
         logger.debug(
             f"Found {len(annotations)} "
@@ -59,15 +58,6 @@ class PdfExtractor:
     def _is_pdf(self, fname: Path) -> bool:
         """Check if file is a pdf, using mime type."""
         return magic.from_file(fname, mime=True) == "application/pdf"
-
-
-
-    def _tag_from_colorname(self, colorname: str) -> str:
-        color_mapping: dict[str, str] = self._getdict("tags", "plugins.extract")
-        if not color_mapping:
-            return ""
-
-        return color_mapping.get(colorname, "")
 
 
     def _retrieve_annotation_content(self, 
@@ -104,29 +94,3 @@ class PdfExtractor:
         return (None, None)
 
 
-# mimics the functions in papis.config.{getlist,getint,getfloat} etc.
-    def _getdict(self, key: str, section: Optional[str] = None) -> dict[str, str]:
-        """Dict getter
-
-        :returns: A python dict
-        :raises SyntaxError: Whenever the parsed syntax is either not a valid
-            python object or a valid python dict.
-        """
-        rawvalue: Any = papis.config.general_get(key, section=section)
-        if isinstance(rawvalue, dict):
-            return rawvalue
-        try:
-            rawvalue = eval(rawvalue)
-        except Exception:
-            raise SyntaxError(
-                "The key '{}' must be a valid Python object: {}".format(key, rawvalue)
-            )
-        else:
-            if not isinstance(rawvalue, dict):
-                raise SyntaxError(
-                    "The key '{}' must be a valid Python dict. Got: {} (type {!r})".format(
-                        key, rawvalue, type(rawvalue).__name__
-                    )
-                )
-
-            return rawvalue

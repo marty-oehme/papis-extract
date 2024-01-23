@@ -1,9 +1,10 @@
 import math
 from dataclasses import dataclass, field
+from typing import Any, Optional
 
+import chevron
 import papis.config
 from papis.document import Document
-import chevron
 
 TEXT_SIMILARITY_MINIMUM = 0.75
 COLOR_SIMILARITY_MINIMUM = 0.833
@@ -17,7 +18,6 @@ COLORS = {
     "orange": (1, 0.65, 0),
 }
 
-
 @dataclass
 class Annotation:
     """A PDF annotation object.
@@ -26,13 +26,17 @@ class Annotation:
     """
 
     file: str
-    colors: tuple[float, float, float] = field(default_factory=lambda: (0.0, 0.0, 0.0))
+    color: tuple[float, float, float]
     content: str = ""
     note: str = ""
     page: int = 0
     tag: str = ""
     type: str = "Highlight"
     minimum_similarity_color: float = 1.0
+
+    def __post_init__(self):
+        self._color = self.color or field(default_factory=lambda: (0.0, 0.0, 0.0))
+        self.tag = self.tag or self._tag_from_colorname(self.colorname or "")
 
     def format(self, formatting: str, doc: Document = Document()):
         """Return a formatted string of the annotation.
@@ -53,13 +57,22 @@ class Annotation:
         return chevron.render(formatting, data)
 
     @property
+    def color(self):
+        return self._color
+
+    @color.setter
+    def color(self, value: tuple[float, float, float]):
+        self._color = value
+        self.tag = self._tag_from_colorname(self.colorname or "")
+
+    @property
     def colorname(self):
         """Return the stringified version of the annotation color.
 
         Finds the closest named color to the annotation and returns it,
         using euclidian distance between the two color vectors.
         """
-        annot_colors = self.colors or (0.0, 0.0, 0.0)
+        annot_colors = self.color or (0.0, 0.0, 0.0)
         nearest = None
         minimum_similarity = (
             papis.config.getfloat("minimum_similarity_color", "plugins.extract") or 1.0
@@ -81,3 +94,37 @@ class Annotation:
         difference between full black and full white, as a float.
         """
         return 1 - (abs(math.dist([*color_one], [*color_two])) / 3)
+
+    def _tag_from_colorname(self, colorname: str) -> str:
+        color_mapping: dict[str, str] = self._getdict("tags", "plugins.extract")
+        if not color_mapping:
+            return ""
+
+        return color_mapping.get(colorname, "")
+
+    # mimics the functions in papis.config.{getlist,getint,getfloat} etc.
+    def _getdict(self, key: str, section: Optional[str] = None) -> dict[str, str]:
+        """Dict getter
+
+        :returns: A python dict
+        :raises SyntaxError: Whenever the parsed syntax is either not a valid
+            python object or a valid python dict.
+        """
+        rawvalue: Any = papis.config.general_get(key, section=section)
+        if isinstance(rawvalue, dict):
+            return rawvalue
+        try:
+            rawvalue = eval(rawvalue)
+        except Exception:
+            raise SyntaxError(
+                "The key '{}' must be a valid Python object: {}".format(key, rawvalue)
+            )
+        else:
+            if not isinstance(rawvalue, dict):
+                raise SyntaxError(
+                    "The key '{}' must be a valid Python dict. Got: {} (type {!r})".format(
+                        key, rawvalue, type(rawvalue).__name__
+                    )
+                )
+
+            return rawvalue
