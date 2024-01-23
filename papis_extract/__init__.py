@@ -35,12 +35,14 @@ papis.config.register_default_settings(DEFAULT_OPTIONS)
 @click.option(
     "--write/--no-write",
     "-w",
-    help="Do not write annotations to notes only print results to stdout.",
+    help="Write extracted annotations into papis notes.",
+    show_default=True,
 )
 @click.option(
     "--manual/--no-manual",
     "-m",
     help="Open note in editor for manual editing after annotation extraction.",
+    show_default=True,
 )
 @click.option(
     "--template",
@@ -50,6 +52,7 @@ papis.config.register_default_settings(DEFAULT_OPTIONS)
         case_sensitive=False,
     ),
     help="Choose an output template to format annotations with.",
+    show_default=True,
 )
 @click.option(
     "--extractor",
@@ -61,12 +64,13 @@ papis.config.register_default_settings(DEFAULT_OPTIONS)
     ),
     default=list(all_extractors.keys()),
     multiple=True,
-    help="Choose an extractor to apply to the selected documents.",
+    help="Choose an extractor to apply to the selected documents.  [default: all]",
 )
 @click.option(
     "--force/--no-force",
     "-f",
     help="Do not drop any annotations because they already exist.",
+    show_default=True,
 )
 def main(
     query: str,
