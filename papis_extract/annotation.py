@@ -42,11 +42,11 @@ class Annotation:
     ) -> None:
         self.minimum_similarity_color = minimum_similarity_color
         self.file = file
-        self.color = color
+        self._color = color
         self.content = content
         self.note = note
         self.page = page
-        self.tag = tag
+        self.tag = tag or self._tag_from_colorname(self.colorname or "")
         self.type = type
 
     def format(self, formatting: str, doc: Document = Document()):
