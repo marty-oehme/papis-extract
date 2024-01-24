@@ -23,14 +23,12 @@ class PocketBookExtractor:
         Returns all readable annotations contained in the file
         passed in, with highlights, notes and pages if available.
         """
-        annotations: list[Annotation] = []
-        try:
-            with open(filename) as f:
-                html = BeautifulSoup(f.read(), features="xml")
-        except FileNotFoundError:
-            logger.error(f"Could not open file {filename} for extraction.")
+        content = self._read_file(filename)
+        if not content:
             return []
+        html = BeautifulSoup(content, features="xml")
 
+        annotations: list[Annotation] = []
         for bm in html.select("div.bookmark"):
             content = (bm.select_one("div.bm-text>p") or html.new_string("")).text
             note = (bm.select_one("div.bm-note>p") or html.new_string("")).text
@@ -58,3 +56,13 @@ class PocketBookExtractor:
             f"{'annotation' if len(annotations) == 1 else 'annotations'} for {filename}."
         )
         return annotations
+
+    def _read_file(self, filename: Path) -> str:
+        try:
+            with open(filename) as f:
+                return f.read()
+        except FileNotFoundError:
+            logger.error(f"Could not open file {filename} for extraction.")
+            return ""
+
+
