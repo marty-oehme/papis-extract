@@ -11,8 +11,8 @@ from papis_extract.formatter import (
 
 document = Document(data={"author": "document-author", "title": "document-title"})
 annotations = [
-    Annotation("myfile.pdf", text="my lovely text"),
-    Annotation("myfile.pdf", text="my second text", content="with note"),
+    Annotation("myfile.pdf", content="my lovely text"),
+    Annotation("myfile.pdf", content="my second text", note="with note"),
 ]
 md_default_output = """==============   ---------------
 document-title - document-author

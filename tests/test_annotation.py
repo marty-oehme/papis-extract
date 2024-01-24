@@ -1,5 +1,6 @@
-from papis.document import Document
 import pytest
+from papis.document import Document
+
 from papis_extract.annotation import Annotation
 
 
@@ -20,8 +21,8 @@ from papis_extract.annotation import Annotation
 def test_formatting_replacements(fmt_string, expected):
     sut = Annotation(
         "myfile",
-        text="I am the text value",
-        content="Whereas I represent the note",
+        content="I am the text value",
+        note="Whereas I represent the note",
     )
 
     assert sut.format(fmt_string) == expected
@@ -38,8 +39,8 @@ def test_formatting_replacements(fmt_string, expected):
 def test_formatting_document_access(fmt_string, expected):
     sut = Annotation(
         "myfile",
-        text="I am the text value",
-        content="Whereas I represent the note",
+        content="I am the text value",
+        note="Whereas I represent the note",
     )
     doc = Document(data={"title": "document-title", "author": "document-author"})
 
@@ -47,7 +48,7 @@ def test_formatting_document_access(fmt_string, expected):
 
 
 def test_colorname_matches_exact():
-    sut = Annotation("testfile", colors=(1.0, 0.0, 0.0), minimum_similarity_color=1.0)
+    sut = Annotation("testfile", color=(1.0, 0.0, 0.0), minimum_similarity_color=1.0)
     c_name = sut.colorname
     assert c_name == "red"
 
@@ -64,6 +65,6 @@ def test_colorname_matches_exact():
     ],
 )
 def test_matches_inexact_colorname(color_value):
-    sut = Annotation("testfile", colors=color_value, minimum_similarity_color=0.833)
+    sut = Annotation("testfile", color=color_value, minimum_similarity_color=0.833)
     c_name = sut.colorname
     assert c_name == "red"
