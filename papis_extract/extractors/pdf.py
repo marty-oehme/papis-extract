@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Any, Optional
 
 import fitz
 import Levenshtein
@@ -43,7 +42,7 @@ class PdfExtractor:
                         file=str(filename),
                         content=quote or "",
                         note=note or "",
-                        colors=col,
+                        color=col,
                         type=annot.type[1],
                         page=(page.number or 0) + 1,
                     )
@@ -54,14 +53,12 @@ class PdfExtractor:
         )
         return annotations
 
-
     def _is_pdf(self, fname: Path) -> bool:
         """Check if file is a pdf, using mime type."""
         return magic.from_file(fname, mime=True) == "application/pdf"
 
-
-    def _retrieve_annotation_content(self, 
-        page: fitz.Page, annotation: fitz.Annot
+    def _retrieve_annotation_content(
+        self, page: fitz.Page, annotation: fitz.Annot
     ) -> tuple[str | None, str | None]:
         """Gets the text content of an annotation.
 
@@ -77,7 +74,8 @@ class PdfExtractor:
 
         # highlight with selection in note
         minimum_similarity = (
-            papis.config.getfloat("minimum_similarity_content", "plugins.extract") or 1.0
+            papis.config.getfloat("minimum_similarity_content", "plugins.extract")
+            or 1.0
         )
         if Levenshtein.ratio(content, written) > minimum_similarity:
             return (content, None)
@@ -92,5 +90,3 @@ class PdfExtractor:
             return (written, None)
         # just a highlight without any text
         return (None, None)
-
-

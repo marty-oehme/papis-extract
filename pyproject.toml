@@ -19,9 +19,11 @@ click = "^8.1.7"
 whoosh = { version = "^2.7.4", optional = true }
 python-magic = "^0.4.27"
 chevron = "^0.14.0"
+beautifulsoup4 = { version = "^4.12.3", optional = true }
 
 [tool.poetry.extras]
 whoosh = ["whoosh"]
+pocketbook = ["beautifulsoup4"]
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"

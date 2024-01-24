@@ -47,6 +47,6 @@ def start(
     if not file_available:
         # have to remove curlys or papis logger gets upset
         desc = re.sub("[{}]", "", papis.document.describe(document))
-        logger.warning("Did not find suitable file for document: " f"{desc}")
+        logger.info(f"No {type(extractor)} file for document: {desc}")
 
     return annotations

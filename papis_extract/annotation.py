@@ -9,14 +9,18 @@ from papis.document import Document
 TEXT_SIMILARITY_MINIMUM = 0.75
 COLOR_SIMILARITY_MINIMUM = 0.833
 
-COLORS = {
-    "red": (1, 0, 0),
-    "green": (0, 1, 0),
+COLORS: dict[str, tuple[float, float, float]] = {
     "blue": (0, 0, 1),
+    "green": (0, 1, 0),
+    "red": (1, 0, 0),
+    "cyan": (0, 1, 1),
     "yellow": (1, 1, 0),
+    "magenta": (1, 0, 1),
     "purple": (0.5, 0, 0.5),
+    "pink": (1, 0.75, 0.8),
     "orange": (1, 0.65, 0),
 }
+
 
 @dataclass
 class Annotation:

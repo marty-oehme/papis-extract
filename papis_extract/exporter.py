@@ -98,7 +98,7 @@ def _add_annots_to_note(
         f.write("\n")
         logger.info(
             f"Wrote {len(new_annotations)} "
-            f"{'annotation' if len(new_annotations) == 1 else 'annotations'} "
+            f"{'line' if len(new_annotations) == 1 else 'lines'} "
             f"to {papis.document.describe(document)}"
         )
 
