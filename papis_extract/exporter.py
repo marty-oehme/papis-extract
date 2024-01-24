@@ -93,7 +93,6 @@ def _add_annots_to_note(
         # add newline if theres no empty space at file end
         if len(existing) > 0 and existing[-1].strip() != "":
             f.write("\n")
-        print(new_annotations)
         f.write("\n\n".join(new_annotations))
         f.write("\n")
         logger.info(
