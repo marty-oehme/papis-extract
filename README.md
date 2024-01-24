@@ -19,6 +19,8 @@ everything should now be set up.
 I am currently working towards the first release for pypi, see the below roadmap;
 when that is done you will also be able to install in the usual pypi way.
 
+If you manage your python environments with `pipx`, you can also `pipx inject --spec 'git+git+https://git.martyoeh.me/Marty/papis-extract.git` to add it to your specific papis environment.
+
 To check if everything is working you should now see the `extract` command listed when running `papis --help`.
 You will be set up with the default options but if you want to change anything, read on in configuration below.
 
@@ -198,6 +200,20 @@ The option should generally not take too much tuning, but it is there if you nee
 
 This should generally be an alright default but is here to be changed for example if you work with a lot of different annotation colors (where dark purple and light purple may different meanings) and get false positives in automatic tag recognition, or no tags are recognized at all.
 
+## Extractors
+
+Currently, the program supports two annotation extractors:
+
+A **`pdf` extractor**, which takes highlights and annotations embedded in any PDF file.
+It should work with most PDF styles, as long as annotations are marked as such 
+(does not work if e.g. highlights are baked onto text, or there is no text in the file).
+
+A `pocketbook` extractor, which takes bookmarks exported from the mobile [PocketBook](https://pocketbook.ch/en-ch/app) reader applications.
+You can export bookmarks by opening a book, going to the notes list and selecting `Export notes...`.
+Then import the resulting `.html` file into the library using `papis add`
+(or `papis addto` to add it to existing documents).
+You are then ready to use extract to get those annotations from the exported list into your notes.
+
 ## TODO: Roadmap to first release
 
 Known issues to be fixed:
@@ -267,7 +283,8 @@ I am not sure if there is much I can do about these issues for now.
 and for myself whenever I forget. The basic building blocks currently in here are three:
 
 - extractors
-: Extract data from a source file attached to a papis document.
+: Extract data from a source file attached to a papis document. 
+  Crawls the actual files attached to documents to put them into annotation-friendly formats.
 
 - annotations
 : The actual extracted blocks of text, containing some metadata
@@ -277,12 +294,12 @@ and for myself whenever I forget. The basic building blocks currently in here ar
 : Put the extracted data somewhere. For now stdout or into your notes.
 
 - formatters
-: Make sure the exporter saves the data according to your preferred layout,
+: Make sure the exporter saves the annotation data according to your preferred layout,
   such as a markdown syntax or csv-structure.
 
-Splitting it into those three building blocks makes it easier to recombine them in any way,
+Splitting it into those building blocks makes it easier to recombine them in any way,
 should someone want to save highlights as csv data in their notes,
-or should we ever include more extractors than the one for PDFs.
+or to include additional extractors or formatters.
 
 To develop it together with an isolated `papis` instance you can simply inject papis into your 
 development environment, e.g. invoking the poetry environment shell and then manually installing:
