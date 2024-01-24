@@ -5,10 +5,19 @@ description = ""
 authors = ["Marty Oehme <marty.oehme@gmail.com>"]
 license = "GPL-3.0-or-later"
 readme = "README.md"
-packages = [{include = "papis_extract"}]
+packages = [{ include = "papis_extract" }]
 homepage = "https://git.martyoeh.me/Marty/papis-extract"
 repository = "https://github.com/marty-oehme/papis-extract"
-keywords = ["papis", "pdf", "biblatex", "bibtex", "bibliography", "reference manager", "research", "science"]
+keywords = [
+    "papis",
+    "pdf",
+    "biblatex",
+    "bibtex",
+    "bibliography",
+    "reference manager",
+    "research",
+    "science",
+]
 
 [tool.poetry.dependencies]
 python = "^3.11"
