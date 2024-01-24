@@ -1084,4 +1084,4 @@ whoosh = ["whoosh"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "02d5ac314a19f14103372c7ceccdaec080df3fdc2fdb1381f2f6343cd6d17db4"
+content-hash = "273c651cac44163ca183313ce3c7384577f090fd98fa6d28e6a3496cb28254ac"

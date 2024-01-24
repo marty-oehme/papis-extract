@@ -29,18 +29,25 @@ class Annotation:
     Contains all information necessary for the annotation itself, content and metadata.
     """
 
-    file: str
-    color: tuple[float, float, float]
-    content: str = ""
-    note: str = ""
-    page: int = 0
-    tag: str = ""
-    type: str = "Highlight"
-    minimum_similarity_color: float = 1.0
-
-    def __post_init__(self):
-        self._color = self.color or field(default_factory=lambda: (0.0, 0.0, 0.0))
-        self.tag = self.tag or self._tag_from_colorname(self.colorname or "")
+    def __init__(
+        self,
+        file: str,
+        color: tuple[float, float, float] = (0.0, 0.0, 0.0),
+        content: str = "",
+        note: str = "",
+        page: int = 0,
+        tag: str = "",
+        type: str = "Highlight",
+        minimum_similarity_color: float = 1.0,
+    ) -> None:
+        self.minimum_similarity_color = minimum_similarity_color
+        self.file = file
+        self.color = color
+        self.content = content
+        self.note = note
+        self.page = page
+        self.tag = tag
+        self.type = type
 
     def format(self, formatting: str, doc: Document = Document()):
         """Return a formatted string of the annotation.
@@ -89,7 +96,11 @@ class Annotation:
                 nearest = name
         return nearest
 
-    def _color_similarity_ratio(self, color_one, color_two):
+    def _color_similarity_ratio(
+        self,
+        color_one: tuple[float, float, float],
+        color_two: tuple[float, float, float],
+    ) -> float:
         """Return the similarity of two colors between 0 and 1.
 
         Takes two rgb color tuples made of floats between 0 and 1,
