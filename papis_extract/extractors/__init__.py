@@ -1,3 +1,5 @@
+from importlib.util import find_spec
+
 import papis.logging
 
 from papis_extract.extraction import Extractor
@@ -6,14 +8,11 @@ from papis_extract.extractors.pocketbook import PocketBookExtractor
 
 logger = papis.logging.get_logger(__name__)
 
-all_extractors: dict[str, Extractor] = {
-    "pdf": pdf.PdfExtractor(),
-}
+all_extractors: dict[str, Extractor] = {}
 
-try:
-    import bs4
-    import magic
+all_extractors["pdf"] = pdf.PdfExtractor()
 
+if find_spec("bs4") and find_spec("magic"):
     all_extractors["pocketbook"] = PocketBookExtractor()
-except ImportError:
+else:
     logger.debug("pocketbook extractor not activated.")
