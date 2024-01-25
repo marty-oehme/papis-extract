@@ -130,7 +130,7 @@ def run(
 ) -> None:
     if write:
         exporter: Exporter = all_exporters["notes"](
-            formatter=formatter or formatters["markdown"],
+            formatter=formatter or formatters["markdown-atx"],
             edit=edit,
             git=git,
             force=force,
