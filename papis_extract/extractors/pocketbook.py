@@ -12,11 +12,11 @@ logger = papis.logging.get_logger(__name__)
 
 class PocketBookExtractor:
     def can_process(self, filename: Path) -> bool:
-        content = self._read_file(filename)
-        if not content:
+        if not magic.from_file(filename, mime=True) == "text/xml":
             return False
 
-        if not magic.from_buffer(content, mime=True) == "text/xml":
+        content = self._read_file(filename)
+        if not content:
             return False
 
         html = BeautifulSoup(content, features="xml")
