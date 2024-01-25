@@ -7,9 +7,11 @@ import papis.notes
 import papis.strings
 from papis.document import Document
 
-from papis_extract import exporter, extraction
-from papis_extract.extractors import all_extractors
 from papis_extract.annotation import Annotation
+from papis_extract import extraction
+from papis_extract.exporter import Exporter
+from papis_extract.extractors import all_extractors
+from papis_extract.exporters import all_exporters
 from papis_extract.formatter import Formatter, formatters
 
 logger = papis.logging.get_logger(__name__)
@@ -126,24 +128,25 @@ def run(
     git: bool = False,
     force: bool = False,
 ) -> None:
+    if write:
+        exporter: Exporter = all_exporters["notes"](
+            formatter=formatter or formatters["markdown"],
+            edit=edit,
+            git=git,
+            force=force,
+        )
+    else:
+        exporter: Exporter = all_exporters["stdout"](
+            formatter=formatter or formatters["markdown"]
+        )
+
+    doc_annots: list[tuple[Document, list[Annotation]]] = []
     for doc in documents:
+        annotations: list[Annotation] = []
         for ext in extractors:
             if not ext:
                 continue
+            annotations.extend(extraction.start(ext, doc))
+        doc_annots.append((doc, annotations))
 
-            annotations: list[Annotation] = extraction.start(ext, doc)
-            if write:
-                exporter.to_notes(
-                    formatter=formatter or formatters["markdown-atx"],
-                    document=doc,
-                    annotations=annotations,
-                    edit=edit,
-                    git=git,
-                    force=force,
-                )
-            else:
-                exporter.to_stdout(
-                    formatter=formatter or formatters["markdown"],
-                    document=doc,
-                    annotations=annotations,
-                )
+    exporter.run(doc_annots)
