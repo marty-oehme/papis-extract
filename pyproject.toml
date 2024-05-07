@@ -21,8 +21,8 @@ keywords = [
 
 [tool.poetry.dependencies]
 python = "^3.11"
-pymupdf = "^1.23.1"
-levenshtein = "^0.21.1"
+pymupdf = "^1.24.2"
+levenshtein = "^0.25.1"
 papis = "^0.13"
 click = "^8.1.7"
 whoosh = { version = "^2.7.4", optional = true }
