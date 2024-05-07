@@ -25,7 +25,9 @@ To check if everything is working you should now see the `extract` command liste
 You will be set up with the default options but if you want to change anything, read on in configuration below.
 
 > **Note**
-> This plugin is still in fairly early development. It does what I need it to do, but if you have a meticulously organized library *please* make backups before doing any operation which could affect your notes, or make use of the papis-included git options.
+> This plugin is still in fairly early development.
+> It does what I need it to do, but if you have a meticulously organized library *please* make backups before doing any operation which could affect your notes, or make use of the papis-included git options.
+> Take care to read the Issues section of this README if you intend to run it over a large collection.
 
 ## Usage
 
@@ -114,8 +116,9 @@ papis extract --template count
 
 For now, these are the only formatters the plugin knows about.
 
-Be aware that if you write to your notes using a different template the plugin will *not* detect old annotations and drop them,
+Be aware that if you re-write to your notes using a completely different template than the original the plugin will *not* detect old annotations and drop them,
 so you will be doubling up your annotations.
+See the `minimum_similarity_color` configuration option for more details.
 
 ## Configuration
 
@@ -149,6 +152,9 @@ if `False` extraction only happens when you explicitly invoke it.
 
 Extraction will *not* happen automatically when you add new annotations to an existing document,
 regardless of this setting.
+
+> **Note**
+> This option does not work yet due to currently missing upstream features.
 
 ### Automatic tagging
 
@@ -254,6 +260,7 @@ features to be implemented:
     - called `--template` in current implementation
 - [ ] on_add hook to extract annotations as files are added
     - needs upstream help, 'on_add' hook, and pass-through of affected documents
+- [ ] target same minimum Python version as papis upstream (3.8 as of papis 0.13)
 
 upstream changes:
 
@@ -261,6 +268,12 @@ upstream changes:
 - [ ] need hooks to actually pass through information on the thing they worked on (i.e. their document)
 
 ## Issues
+
+First, a note in general: There is the functionality to run this plugin over your whole library in a single command and also in a way that makes permanent changes to that library.
+This is intended and, in my view, an important aspect of what this plugin provides and the batch functionality of cli programs in general.
+However, it can also lead to frustrating clean-up time if something messes up or, in the worst case, data loss.
+The extractors attempt to ascertain what files they can operate on with certain heuristics but will not be fail-safe.
+Take the note at the top of this README to heart and always have backups on hand before larger operations.
 
 A note on the extraction: Highlights in pdfs can be somewhat difficult to parse
 (as are most things in them). Sometimes they contain the selected text that is written on the
