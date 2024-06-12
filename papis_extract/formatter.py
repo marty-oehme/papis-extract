@@ -23,15 +23,13 @@ def format_markdown(
 
     heading = f"{document.get('title', '')} - {document.get('author', '')}"
     if headings == "atx":
-        output = f"# {heading}\n\n"
+        output += f"# {heading}\n\n"
     elif headings == "setext":
         title_decoration = (
             f"{'=' * len(document.get('title', ''))}   "
             f"{'-' * len(document.get('author', ''))}"
         )
-        output = f"{title_decoration}\n{heading}\n{title_decoration}\n\n"
-    else:
-        output = ""
+        output += f"{title_decoration}\n{heading}\n{title_decoration}\n\n"
 
     for a in annotations:
         output += a.format(template)

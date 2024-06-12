@@ -88,10 +88,11 @@ def main(
     git: bool,
     force: bool,
 ) -> None:
-    """Extract annotations from any pdf document.
+    """Extract annotations from any documents.
 
     The extract plugin allows manual or automatic extraction of all annotations
-    contained in the pdf documents belonging to entries of the papis library.
+    contained in the documents belonging to entries of the papis library,
+    primarily targeting PDF documents currently.
     It can write those changes to stdout or directly create and update notes
     for papis documents.
 
