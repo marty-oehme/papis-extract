@@ -48,7 +48,7 @@ def test_markdown_setext():
 
 def test_count_default():
     fmt = format_count
-    assert fmt(document, annotations) == ("""document-author - document-title: 2""")
+    assert fmt(document, annotations) == ("""2 document-author: document-title""")
 
 
 def test_csv_default():

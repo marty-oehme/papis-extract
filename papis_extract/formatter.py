@@ -66,10 +66,10 @@ def format_count(
         count += 1
 
     return (
+        f"{count} "
         f"{document.get('author', '')}"
-        f"{' - ' if 'author' in document else ''}"  # only put separator if author
-        f"{document.get('title', '')}: "
-        f"{count}\n"
+        f"{': ' if 'author' in document else ''}"  # only put separator if author
+        f"{document.get('title', '')}"
     ).rstrip()
 
 
