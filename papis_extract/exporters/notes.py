@@ -28,7 +28,8 @@ class NotesExporter:
         documents missing a note field or appends to existing.
         """
         for doc, annots in annot_docs:
-            formatted_annotations = self.formatter(doc, annots).split("\n")
+            # first always true since we write single doc per note
+            formatted_annotations: list[str] = self.formatter(doc, annots, first=True).split("\n")
             if formatted_annotations:
                 self._add_annots_to_note(doc, formatted_annotations, force=self.force)
 
@@ -80,7 +81,9 @@ class NotesExporter:
             # add newline if theres no empty space at file end
             if len(existing) > 0 and existing[-1].strip() != "":
                 f.write("\n")
-            f.write("\n\n".join(new_annotations))
+            # FIXME this either joins them too close or moves them too far apart
+            # We need a better algorithm which knows what a full 'annotation' is.
+            f.write("\n".join(new_annotations))
             f.write("\n")
             logger.info(
                 f"Wrote {len(new_annotations)} "

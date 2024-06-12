@@ -20,7 +20,9 @@ class StdoutExporter:
         the annotations in somewhat of a list form.
         Not intended for machine-readability.
         """
+        first_entry = True
         for doc, annots in annot_docs:
-            output: str = self.formatter(doc, annots)
+            output: str = self.formatter(doc, annots, first=first_entry)
             if output:
                 print("{output}\n".format(output=output.rstrip("\n")))
+                first_entry = False

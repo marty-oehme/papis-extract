@@ -1,15 +1,29 @@
-from collections.abc import Callable
-
+from typing import Protocol
 from papis.document import Document
 
 from papis_extract.annotation import Annotation
 
-Formatter = Callable[[Document, list[Annotation]], str]
+class Formatter(Protocol):
+    """Basic formatter protocol.
+
+    Every valid formatter must implement at least this protocol.
+    A formatter is a function which receives a document and a list
+    of annotations and spits them out in some formatted way.
+
+    Formatters additionally must take the (often optional) passed
+    parameter 'first' which signals to the formatter that the current
+    document entry is the very first one to be printed in whatever
+    exporter is used, if multiple entries are printed.
+    This can be useful for adding a header if necessary for the format.
+    """
+    def __call__(self, document: Document, annotations: list[Annotation], first: bool) -> str:
+        ...
 
 
 def format_markdown(
     document: Document = Document(),
     annotations: list[Annotation] = [],
+    first: bool = False,
     headings: str = "setext",  # setext | atx | None
 ) -> str:
     if not annotations:
@@ -43,6 +57,7 @@ def format_markdown(
 def format_markdown_atx(
     document: Document = Document(),
     annotations: list[Annotation] = [],
+    first: bool = False,
 ) -> str:
     return format_markdown(document, annotations, headings="atx")
 
@@ -50,6 +65,7 @@ def format_markdown_atx(
 def format_markdown_setext(
     document: Document = Document(),
     annotations: list[Annotation] = [],
+    first: bool = False,
 ) -> str:
     return format_markdown(document, annotations, headings="setext")
 
@@ -57,6 +73,7 @@ def format_markdown_setext(
 def format_count(
     document: Document = Document(),
     annotations: list[Annotation] = [],
+    first: bool = False,
 ) -> str:
     if not annotations:
         return ""
@@ -76,13 +93,14 @@ def format_count(
 def format_csv(
     document: Document = Document(),
     annotations: list[Annotation] = [],
+    first: bool = False,
 ) -> str:
     header: str = "type,tag,page,quote,note,author,title,ref,file"
     template: str = (
         '{{type}},{{tag}},{{page}},"{{quote}}","{{note}}",'
         '"{{doc.author}}","{{doc.title}}","{{doc.ref}}","{{file}}"'
     )
-    output = f"{header}\n"
+    output = f"{header}\n" if first else ""
     if not annotations:
         return ""
 

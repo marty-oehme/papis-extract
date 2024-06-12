@@ -54,6 +54,15 @@ def test_count_default():
 def test_csv_default():
     fmt = format_csv
     assert fmt(document, annotations) == (
+        'Highlight,,0,"my lovely text","","document-author",'
+        '"document-title","","myfile.pdf"\n'
+        'Highlight,,0,"my second text","with note","document-author",'
+        '"document-title","","myfile.pdf"'
+    )
+
+def test_csv_with_header():
+    fmt = format_csv
+    assert fmt(document, annotations, first=True) == (
         "type,tag,page,quote,note,author,title,ref,file\n"
         'Highlight,,0,"my lovely text","","document-author",'
         '"document-title","","myfile.pdf"\n'
