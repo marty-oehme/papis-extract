@@ -3,6 +3,7 @@ from papis.document import Document
 
 from papis_extract.annotation import Annotation
 
+
 class Formatter(Protocol):
     """Basic formatter protocol.
 
@@ -16,8 +17,10 @@ class Formatter(Protocol):
     exporter is used, if multiple entries are printed.
     This can be useful for adding a header if necessary for the format.
     """
-    def __call__(self, document: Document, annotations: list[Annotation], first: bool) -> str:
-        ...
+
+    def __call__(
+        self, document: Document, annotations: list[Annotation], first: bool
+    ) -> str: ...
 
 
 def format_markdown(

@@ -24,5 +24,4 @@ class Exporter(Protocol):
 
     def run(
         self, annot_docs: list[tuple[papis.document.Document, list[Annotation]]]
-    ) -> None:
-        ...
+    ) -> None: ...

@@ -14,11 +14,9 @@ logger = papis.logging.get_logger(__name__)
 
 
 class Extractor(Protocol):
-    def can_process(self, filename: Path) -> bool:
-        ...
+    def can_process(self, filename: Path) -> bool: ...
 
-    def run(self, filename: Path) -> list[Annotation]:
-        ...
+    def run(self, filename: Path) -> list[Annotation]: ...
 
 
 def start(

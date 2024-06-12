@@ -60,6 +60,7 @@ def test_csv_default():
         '"document-title","","myfile.pdf"'
     )
 
+
 def test_csv_with_header():
     fmt = format_csv
     assert fmt(document, annotations, first=True) == (

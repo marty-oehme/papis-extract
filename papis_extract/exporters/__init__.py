@@ -1,4 +1,3 @@
-
 import papis.logging
 
 from papis_extract.exporter import Exporter

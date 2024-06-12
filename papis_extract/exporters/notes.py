@@ -29,7 +29,9 @@ class NotesExporter:
         """
         for doc, annots in annot_docs:
             # first always true since we write single doc per note
-            formatted_annotations: list[str] = self.formatter(doc, annots, first=True).split("\n")
+            formatted_annotations: list[str] = self.formatter(
+                doc, annots, first=True
+            ).split("\n")
             if formatted_annotations:
                 self._add_annots_to_note(doc, formatted_annotations, force=self.force)
 
