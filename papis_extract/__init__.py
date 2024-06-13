@@ -7,16 +7,16 @@ import papis.notes
 import papis.strings
 from papis.document import Document
 
-from papis_extract.annotation import Annotation
 from papis_extract import extraction
+from papis_extract.annotation import Annotation
 from papis_extract.exporter import Exporter
-from papis_extract.extractors import all_extractors
 from papis_extract.exporters import all_exporters
+from papis_extract.extractors import all_extractors
 from papis_extract.formatter import Formatter, formatters
 
 logger = papis.logging.get_logger(__name__)
 
-DEFAULT_OPTIONS = {
+DEFAULT_OPTIONS: dict[str, dict[str, bool | float | dict[str, str]]] = {
     "plugins.extract": {
         "tags": {},
         "on_import": False,
@@ -129,15 +129,16 @@ def run(
     git: bool = False,
     force: bool = False,
 ) -> None:
+    exporter: Exporter
     if write:
-        exporter: Exporter = all_exporters["notes"](
+        exporter = all_exporters["notes"](
             formatter=formatter or formatters["markdown-atx"],
             edit=edit,
             git=git,
             force=force,
         )
     else:
-        exporter: Exporter = all_exporters["stdout"](
+        exporter = all_exporters["stdout"](
             formatter=formatter or formatters["markdown"]
         )
 
