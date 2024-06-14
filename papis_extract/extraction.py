@@ -2,13 +2,13 @@ import re
 from pathlib import Path
 from typing import Protocol
 
-import fitz
 import papis.config
 import papis.document
 import papis.logging
 from papis.document import Document
 
 from papis_extract.annotation import Annotation
+from papis_extract.extractors import ExtractionError
 
 logger = papis.logging.get_logger(__name__)
 
@@ -39,8 +39,8 @@ def start(
 
         try:
             annotations.extend(extractor.run(fname))
-        except fitz.FileDataError as e:
-            print(f"File structure errors for {file}.\n{e}")
+        except ExtractionError as e:
+            print(f"File extraction errors for {file}.\n{e}")
 
     if not file_available:
         # have to remove curlys or papis logger gets upset

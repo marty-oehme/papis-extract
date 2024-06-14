@@ -7,6 +7,7 @@ import papis.config
 import papis.logging
 
 from papis_extract.annotation import Annotation
+from papis_extract.extractors import ExtractionError
 
 logger = papis.logging.get_logger(__name__)
 
@@ -26,31 +27,43 @@ class PdfExtractor:
         Returns all readable annotations contained in the file
         passed in. Only returns Highlight or Text annotations.
         """
-        annotations = []
-        with fitz.Document(filename) as doc:
-            for page in doc:
-                for annot in page.annots():
-                    quote, note = self._retrieve_annotation_content(page, annot)
-                    if not quote and not note:
-                        continue
-                    col = (
-                        annot.colors.get("fill")
-                        or annot.colors.get("stroke")
-                        or (0.0, 0.0, 0.0)
-                    )
-                    a = Annotation(
-                        file=str(filename),
-                        content=quote or "",
-                        note=note or "",
-                        color=col,
-                        type=annot.type[1],
-                        page=(page.number or 0) + 1,
-                    )
-                    annotations.append(a)
-        logger.debug(
-            f"Found {len(annotations)} "
-            f"{'annotation' if len(annotations) == 1 else 'annotations'} for {filename}."
-        )
+        annotations: list[Annotation] = []
+        try:
+            with mu.Document(filename) as doc:
+                for page in doc:  # pyright: ignore [reportUnknownVariableType] - missing stub
+                    page = cast(mu.Page, page)
+                    annot: mu.Annot
+                    for annot in page.annots():
+                        quote, note = self._retrieve_annotation_content(page, annot)
+                        if not quote and not note:
+                            continue
+                        color: tuple[float, float, float] = cast(
+                            tuple[float, float, float],
+                            (
+                                annot.colors.get("fill")
+                                or annot.colors.get("stroke")
+                                or (0.0, 0.0, 0.0)
+                            ),
+                        )
+                        page_nr: int = cast(int, page.number or 0)
+                        highlight_type: str = cast(str, annot.type[1] or "")
+                        a = Annotation(
+                            file=str(filename),
+                            content=quote or "",
+                            note=note or "",
+                            color=color,
+                            type=highlight_type,
+                            page=page_nr,
+                        )
+                        annotations.append(a)
+            logger.debug(
+                f"Found {len(annotations)} "
+                f"{'annotation' if len(annotations) == 1 else 'annotations'} for {filename}."
+            )
+
+        except mu.FileDataError as e:
+            raise ExtractionError
+
         return annotations
 
     def _is_pdf(self, fname: Path) -> bool:
@@ -58,7 +71,7 @@ class PdfExtractor:
         return magic.from_file(fname, mime=True) == "application/pdf"
 
     def _retrieve_annotation_content(
-        self, page: fitz.Page, annotation: fitz.Annot
+        self, page: mu.Page, annotation: mu.Annot
     ) -> tuple[str | None, str | None]:
         """Gets the text content of an annotation.
 
