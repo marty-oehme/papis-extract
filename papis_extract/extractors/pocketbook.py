@@ -1,3 +1,4 @@
+# pyright: strict, reportUnknownMemberType=false
 from pathlib import Path
 
 import magic
@@ -42,9 +43,18 @@ class PocketBookExtractor:
 
         annotations: list[Annotation] = []
         for bm in html.select("div.bookmark"):
-            content = (bm.select_one("div.bm-text>p") or html.new_string("")).text
-            note = (bm.select_one("div.bm-note>p") or html.new_string("")).text
-            page = (bm.select_one("p.bm-page") or html.new_string("")).text
+            content = str(
+                (bm.select_one("div.bm-text>p") or html.new_string("")).text
+                or ""  # pyright: ignore [reportUnknownArgumentType]
+            )
+            note = str(
+                (bm.select_one("div.bm-note>p") or html.new_string("")).text
+                or ""  # pyright: ignore [reportUnknownArgumentType]
+            )
+            page = int(
+                (bm.select_one("p.bm-page") or html.new_string("")).text
+                or 0  # pyright: ignore [reportUnknownArgumentType]
+            )
 
             el_classes = bm.attrs.get("class", "").split(" ")
             color = (0, 0, 0)
@@ -55,11 +65,11 @@ class PocketBookExtractor:
 
             a = Annotation(
                 file=str(filename),
-                content=content or "",
-                note=note or "",
+                content=content,
+                note=note,
                 color=color,
                 type="Highlight",
-                page=int(page),
+                page=page,
             )
             annotations.append(a)
 

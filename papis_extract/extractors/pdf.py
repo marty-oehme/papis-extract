@@ -1,10 +1,12 @@
+# pyright: strict, reportMissingTypeStubs=false, reportUnknownMemberType=false
 from pathlib import Path
+from typing import cast
 
-import fitz
 import Levenshtein
 import magic
 import papis.config
 import papis.logging
+import pymupdf as mu
 
 from papis_extract.annotation import Annotation
 from papis_extract.extractors import ExtractionError
@@ -30,7 +32,9 @@ class PdfExtractor:
         annotations: list[Annotation] = []
         try:
             with mu.Document(filename) as doc:
-                for page in doc:  # pyright: ignore [reportUnknownVariableType] - missing stub
+                for (
+                    page
+                ) in doc:  # pyright: ignore [reportUnknownVariableType] - missing stub
                     page = cast(mu.Page, page)
                     annot: mu.Annot
                     for annot in page.annots():
@@ -61,7 +65,7 @@ class PdfExtractor:
                 f"{'annotation' if len(annotations) == 1 else 'annotations'} for {filename}."
             )
 
-        except mu.FileDataError as e:
+        except mu.FileDataError:
             raise ExtractionError
 
         return annotations
@@ -82,7 +86,7 @@ class PdfExtractor:
         should both be included or are the same, using
         Levenshtein distance.
         """
-        content = annotation.info["content"].replace("\n", " ")
+        content = cast(str, annotation.info["content"].replace("\n", " "))
         written = page.get_textbox(annotation.rect).replace("\n", " ")
 
         # highlight with selection in note

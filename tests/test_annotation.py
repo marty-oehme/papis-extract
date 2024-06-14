@@ -18,7 +18,7 @@ from papis_extract.annotation import Annotation
         ),
     ],
 )
-def test_formatting_replacements(fmt_string, expected):
+def test_formatting_replacements(fmt_string: str, expected: str):
     sut = Annotation(
         "myfile",
         content="I am the text value",
@@ -36,7 +36,7 @@ def test_formatting_replacements(fmt_string, expected):
         ("{{quote}} ({{doc.author}})", "I am the text value (document-author)"),
     ],
 )
-def test_formatting_document_access(fmt_string, expected):
+def test_formatting_document_access(fmt_string: str, expected: str):
     sut = Annotation(
         "myfile",
         content="I am the text value",
@@ -64,7 +64,7 @@ def test_colorname_matches_exact():
         (0.51, 0.0, 0.0),
     ],
 )
-def test_matches_inexact_colorname(color_value):
+def test_matches_inexact_colorname(color_value: tuple[float, float, float]):
     sut = Annotation("testfile", color=color_value, minimum_similarity_color=0.833)
     c_name = sut.colorname
     assert c_name == "red"

@@ -1,6 +1,6 @@
 import math
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any, Optional, cast
 
 import chevron
 import papis.config
@@ -127,7 +127,7 @@ class Annotation:
         """
         rawvalue: Any = papis.config.general_get(key, section=section)
         if isinstance(rawvalue, dict):
-            return rawvalue
+            return cast(dict[str, str], rawvalue)
         try:
             rawvalue = eval(rawvalue)
         except Exception:
@@ -142,4 +142,4 @@ class Annotation:
                     )
                 )
 
-            return rawvalue
+            return cast(dict[str, str], rawvalue)
