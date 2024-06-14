@@ -1,3 +1,4 @@
+import re
 import click
 import papis.cli
 import papis.config
@@ -145,10 +146,18 @@ def run(
     doc_annots: list[tuple[Document, list[Annotation]]] = []
     for doc in documents:
         annotations: list[Annotation] = []
+        valid_files: int = 0
         for ext in extractors:
             if not ext:
                 continue
-            annotations.extend(extraction.start(ext, doc))
+            added = extraction.start(ext, doc)
+            if added is not None:
+                valid_files += 1
+                annotations.extend(added)
         doc_annots.append((doc, annotations))
 
+        if valid_files == 0:
+            # have to remove curlys or papis logger gets upset
+            desc = re.sub("[{}]", "", papis.document.describe(doc))
+            logger.info(f"Document {desc} has no valid extractors for any of its files.")
     exporter.run(doc_annots)

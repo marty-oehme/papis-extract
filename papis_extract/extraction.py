@@ -1,4 +1,3 @@
-import re
 from pathlib import Path
 from typing import Protocol
 
@@ -22,11 +21,13 @@ class Extractor(Protocol):
 def start(
     extractor: Extractor,
     document: Document,
-) -> list[Annotation]:
+) -> list[Annotation] | None:
     """Extract all annotations from passed documents.
 
     Returns all annotations contained in the papis
-    documents passed in.
+    documents passed in (empty list if no annotations).
+    If there are no files that the extractor can process,
+    returns None instead.
     """
     annotations: list[Annotation] = []
     file_available: bool = False
@@ -40,11 +41,9 @@ def start(
         try:
             annotations.extend(extractor.run(fname))
         except ExtractionError as e:
-            print(f"File extraction errors for {file}.\n{e}")
+            logger.error(f"File extraction errors for {file}. File may be damaged.\n{e}")
 
     if not file_available:
-        # have to remove curlys or papis logger gets upset
-        desc = re.sub("[{}]", "", papis.document.describe(document))
-        logger.info(f"No {type(extractor)} file for document: {desc}")
+        return None
 
     return annotations
