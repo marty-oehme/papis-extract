@@ -9,7 +9,7 @@ import papis.logging
 import pymupdf as mu
 
 from papis_extract.annotation import Annotation
-from papis_extract.extractors import ExtractionError
+from papis_extract.exceptions import ExtractionError
 
 logger = papis.logging.get_logger(__name__)
 

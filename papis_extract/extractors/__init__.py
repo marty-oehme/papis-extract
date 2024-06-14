@@ -16,13 +16,3 @@ if find_spec("bs4") and find_spec("magic"):
     all_extractors["pocketbook"] = PocketBookExtractor()
 else:
     logger.debug("pocketbook extractor not activated.")
-
-
-class ExtractionError(Exception):
-    """Raised for exceptions during extraction.
-
-    Something went wrong during the extraction process in the extractor
-    run routine itself.
-    """
-
-    pass
