@@ -1,4 +1,5 @@
 import re
+
 import click
 import papis.cli
 import papis.config
@@ -159,5 +160,7 @@ def run(
         if valid_files == 0:
             # have to remove curlys or papis logger gets upset
             desc = re.sub("[{}]", "", papis.document.describe(doc))
-            logger.info(f"Document {desc} has no valid extractors for any of its files.")
+            logger.info(
+                f"Document {desc} has no valid extractors for any of its files."
+            )
     exporter.run(doc_annots)

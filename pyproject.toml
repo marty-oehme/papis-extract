@@ -1,13 +1,21 @@
-[tool.poetry]
+[project]
+authors = [
+    {name = "Marty Oehme", email = "contact@martyoeh.me"},
+]
+license = {text = "GPL-3.0-or-later"}
+requires-python = "<4.0,>=3.11"
+dependencies = [
+    "pymupdf<2.0.0,>=1.24.2",
+    "levenshtein<1.0.0,>=0.25.1",
+    "papis<1.0,>=0.13",
+    "click<9.0.0,>=8.1.7",
+    "python-magic<1.0.0,>=0.4.27",
+    "chevron<1.0.0,>=0.14.0",
+]
 name = "papis-extract"
 version = "0.2.0"
 description = ""
-authors = ["Marty Oehme <marty.oehme@gmail.com>"]
-license = "GPL-3.0-or-later"
 readme = "README.md"
-packages = [{ include = "papis_extract" }]
-homepage = "https://git.martyoeh.me/Marty/papis-extract"
-repository = "https://github.com/marty-oehme/papis-extract"
 keywords = [
     "papis",
     "pdf",
@@ -19,32 +27,31 @@ keywords = [
     "science",
 ]
 
-[tool.poetry.dependencies]
-python = "^3.11"
-pymupdf = "^1.24.2"
-levenshtein = "^0.25.1"
-papis = "^0.13"
-click = "^8.1.7"
-whoosh = { version = "^2.7.4", optional = true }
-python-magic = "^0.4.27"
-chevron = "^0.14.0"
-beautifulsoup4 = { version = "^4.12.3", optional = true }
+[project.urls]
+homepage = "https://git.martyoeh.me/Marty/papis-extract"
+repository = "https://github.com/marty-oehme/papis-extract"
 
-[tool.poetry.extras]
-whoosh = ["whoosh"]
-pocketbook = ["beautifulsoup4"]
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^7.4.0"
-coverage = "^7.3.1"
-pytest-cov = "^4.1.0"
-
-[tool.poetry.plugins."papis.command"]
+[project.entry-points."papis.command"]
 extract = "papis_extract:main"
 
+[project.optional-dependencies]
+whoosh = [
+    "whoosh<3.0.0,>=2.7.4",
+]
+pocketbook = [
+    "beautifulsoup4<5.0.0,>=4.12.3",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "pytest<8.0.0,>=7.4.0",
+    "coverage<8.0.0,>=7.3.1",
+    "pytest-cov<5.0.0,>=4.1.0",
+]
+
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.pyright]
 typeCheckingMode = "strict"

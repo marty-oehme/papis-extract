@@ -211,7 +211,7 @@ This should generally be an alright default but is here to be changed for exampl
 Currently, the program supports two annotation extractors:
 
 A **`pdf` extractor**, which takes highlights and annotations embedded in any PDF file.
-It should work with most PDF styles, as long as annotations are marked as such 
+It should work with most PDF styles, as long as annotations are marked as such
 (does not work if e.g. highlights are baked onto text, or there is no text in the file).
 
 A `pocketbook` extractor, which takes bookmarks exported from the mobile [PocketBook](https://pocketbook.ch/en-ch/app) reader applications.
@@ -261,6 +261,8 @@ features to be implemented:
 - [ ] on_add hook to extract annotations as files are added
     - needs upstream help, 'on_add' hook, and pass-through of affected documents
 - [ ] target same minimum Python version as papis upstream (3.8 as of papis 0.13)
+- [ ] change detection:
+    - how does it handle updated citations? updated colors? should it be configurable?
 
 upstream changes:
 
@@ -295,9 +297,13 @@ I am not sure if there is much I can do about these issues for now.
 
 and for myself whenever I forget. The basic building blocks currently in here are three:
 
-- extractors
-: Extract data from a source file attached to a papis document. 
+- extractors (= input format)
+: Extract data from a source file attached to a papis document.
   Crawls the actual files attached to documents to put them into annotation-friendly formats.
+
+- formatters (= output format)
+: Make sure the exporter saves the annotation data according to your preferred layout,
+  such as a markdown syntax or csv-structure.
 
 - annotations
 : The actual extracted blocks of text, containing some metadata
@@ -306,24 +312,20 @@ and for myself whenever I forget. The basic building blocks currently in here ar
 - exporters
 : Put the extracted data somewhere. For now stdout or into your notes.
 
-- formatters
-: Make sure the exporter saves the annotation data according to your preferred layout,
-  such as a markdown syntax or csv-structure.
-
 Splitting it into those building blocks makes it easier to recombine them in any way,
 should someone want to save highlights as csv data in their notes,
 or to include additional extractors or formatters.
 
-To develop it together with an isolated `papis` instance you can simply inject papis into your 
-development environment, e.g. invoking the poetry environment shell and then manually installing:
+To develop it together with an isolated `papis` instance you can simply inject papis into your
+development environment, e.g. invoking the uv environment shell and then manually installing:
 
 ```bash
-poetry shell
+uv shell
 pip install papis
 ```
 
 This will leave you with `papis` installed in the same virtual environment as your development.
-However, what I do on my system instead to enable quick testing is inject it into a 
+However, what I do on my system instead to enable quick testing is inject it into a
 system-wide (but isolated with `pipx`) papis setup:
 
 ```bash
