@@ -92,33 +92,33 @@ On my current laptop, extracting ~4000 annotations from ~1000 library documents 
 though this will vary with the length and size of the PDFs you have.
 For smaller workloads the process should be almost instant.
 
-You can change the format that you want your annotations in with the `--template` option.
+You can change the format that you want your annotations in with the `--output` option.
 To output annotations in a markdown-compatible syntax (the default), do:
 
 ```bash
-papis extract --template markdown
+papis extract --output markdown
 ```
 
-There are sub-variants of the formatter for atx-style headers, with `--template markdown-atx` (`# Headings`),
-or setext-style with `--template markdown-setext` (the default style).
+There are sub-variants of the formatter for atx-style headers, with `--output markdown-atx` (`# Headings`),
+or setext-style with `--output markdown-setext` (the default style).
 
 To instead see them in a csv syntax simply invoke:
 
 ```bash
-papis extract --template csv
+papis extract --output csv
 ```
 
 And if you only want to know how many annotations exist in the documents, you can invoke:
 
 ```bash
-papis extract --template count
+papis extract --output count
 ```
 
 For now, these are the only formatters the plugin knows about.
 
-Be aware that if you re-write to your notes using a completely different template than the original the plugin will *not* detect old annotations and drop them,
+Be aware that if you re-write to your notes using a completely different output format than the original the plugin will *not* detect old annotations and drop them,
 so you will be doubling up your annotations.
-See the `minimum_similarity_color` configuration option for more details.
+See the `minimum_similarity` configuration option for more details.
 
 ## Configuration
 
@@ -185,7 +185,7 @@ minimum_similarity_color: 0.833,  # for matching tag to color
 ```
 
 `minimum_similarity` sets the required similarity of an annotation with existing annotations in your notes to be dropped.
-Annotations you have in notes might change if you for example fix small spacing mistakes or a letter/punctuation that has been falsely recognized in the PDF or change similar things.
+Annotations you have in notes might change if you, for example, fix small spacing mistakes or a letter/punctuation that has been falsely recognized in the PDF or change similar things.
 Generally, this should be fine as it is but you should change this value if you either get new annotations dropped though they should be added (decrease the value) or annotations are added duplicating existing ones (increase the value).
 
 ---
@@ -216,8 +216,8 @@ It should work with most PDF styles, as long as annotations are marked as such
 
 A `pocketbook` extractor, which takes bookmarks exported from the mobile [PocketBook](https://pocketbook.ch/en-ch/app) reader applications.
 You can export bookmarks by opening a book, going to the notes list and selecting `Export notes...`.
-Then import the resulting `.html` file into the library using `papis add`
-(or `papis addto` to add it to existing documents).
+Then import the resulting `.html` file into the library like any other document using `papis add`
+(or `papis addto` to add it to existing document references).
 You are then ready to use extract to get those annotations from the exported list into your notes.
 
 ## TODO: Roadmap to first release
@@ -257,7 +257,7 @@ features to be implemented:
 - [ ] `--overwrite` mode where existing annotations are not dropped but overwritten on same line of note
 - [x] `--force` mode where we simply do not drop anything
 - [x] `--format` option to choose from default or set up a custom formatter
-    - called `--template` in current implementation
+    - called `--output` in current implementation
 - [ ] on_add hook to extract annotations as files are added
     - needs upstream help, 'on_add' hook, and pass-through of affected documents
 - [ ] target same minimum Python version as papis upstream (3.8 as of papis 0.13)

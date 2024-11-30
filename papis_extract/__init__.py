@@ -49,18 +49,18 @@ papis.config.register_default_settings(DEFAULT_OPTIONS)
     show_default=True,
 )
 @click.option(
-    "--template",
-    "-t",
+    "--output",
+    "-o",
     type=click.Choice(
         list(formatters.keys()),
         case_sensitive=False,
     ),
-    help="Choose an output template to format annotations with.",
+    help="Choose which format to output annotations in.",
     show_default=True,
 )
 @click.option(
-    "--extractor",
-    "-e",
+    "--input",
+    "-i",
     "extractors",
     type=click.Choice(
         list(all_extractors.keys()),
@@ -68,7 +68,7 @@ papis.config.register_default_settings(DEFAULT_OPTIONS)
     ),
     default=list(all_extractors.keys()),
     multiple=True,
-    help="Choose an extractor to apply to the selected documents.  [default: all]",
+    help="Choose which input formats to gather annotations from.  [default: all]",
 )
 @click.option(
     "--force/--no-force",
@@ -86,7 +86,7 @@ def main(
     manual: bool,
     write: bool,
     extractors: list[str],
-    template: str,
+    output: str,
     git: bool,
     force: bool,
 ) -> None:
@@ -109,7 +109,7 @@ def main(
         logger.warning(papis.strings.no_documents_retrieved_message)
         return
 
-    formatter = formatters.get(template)
+    formatter = formatters.get(output)
 
     run(
         documents,
