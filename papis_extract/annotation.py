@@ -6,8 +6,7 @@ import chevron
 import papis.config
 from papis.document import Document
 
-TEXT_SIMILARITY_MINIMUM = 0.75
-COLOR_SIMILARITY_MINIMUM = 0.833
+COLOR_SIMILARITY_MINIMUM_FALLBACK = 0.833
 
 COLORS: dict[str, tuple[float, float, float]] = {
     "blue": (0, 0, 1),
@@ -38,14 +37,17 @@ class Annotation:
         page: int = 0,
         tag: str = "",
         type: str = "Highlight",
-        minimum_similarity_color: float = 1.0,
+        minimum_similarity_color: float | None = None,
     ) -> None:
-        self.minimum_similarity_color = minimum_similarity_color
         self.file = file
         self._color = color
         self.content = content
         self.note = note
         self.page = page
+        self.minimum_similarity_color = minimum_similarity_color or (
+            papis.config.getfloat("minimum_similarity_color", "plugins.extract")
+            or COLOR_SIMILARITY_MINIMUM_FALLBACK
+        )
         self.tag = tag or self._tag_from_colorname(self.colorname or "")
         self.type = type
 
@@ -85,9 +87,6 @@ class Annotation:
         """
         annot_colors = self.color or (0.0, 0.0, 0.0)
         nearest = None
-        minimum_similarity = (
-            papis.config.getfloat("minimum_similarity_color", "plugins.extract") or 1.0
-        )
         minimum_similarity = self.minimum_similarity_color
         for name, values in COLORS.items():
             similarity_ratio = self._color_similarity_ratio(values, annot_colors)
