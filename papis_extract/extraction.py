@@ -41,7 +41,9 @@ def start(
         try:
             annotations.extend(extractor.run(fname))
         except ExtractionError as e:
-            logger.error(f"File extraction errors for {file}. File may be damaged.\n{e}")
+            logger.error(
+                f"File extraction errors for {file}. File may be damaged.\n{e}"
+            )
 
     if not file_available:
         return None

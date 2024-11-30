@@ -35,7 +35,6 @@ class PdfExtractor:
                 for (
                     page
                 ) in doc:  # pyright: ignore [reportUnknownVariableType] - missing stub
-                    page = cast(mu.Page, page)
                     annot: mu.Annot
                     for annot in page.annots():
                         quote, note = self._retrieve_annotation_content(page, annot)
