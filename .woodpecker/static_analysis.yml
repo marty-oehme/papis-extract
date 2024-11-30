@@ -3,7 +3,7 @@ steps:
     image: nikolaik/python-nodejs
     commands:
       - npm install --global pyright
-      - poetry install
-      - python --version && poetry --version && pyright --version
+      - uv sync
+      - python --version && uv version && pyright --version
       - echo "------------- running pyright typecheck -------------"
-      - poetry run pyright
+      - uv run pyright

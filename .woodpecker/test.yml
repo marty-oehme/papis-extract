@@ -3,9 +3,9 @@ when:
 
 steps:
   pytest:
-    image: ghcr.io/withlogicco/poetry:1.5.1
+    image: nikolaik/python-nodejs
     commands:
-      - poetry install
-      - python --version && poetry --version
+      - uv sync
+      - python --version && uv version
       - echo "------------- running pytest -------------"
-      - poetry run pytest
+      - uv run pytest
