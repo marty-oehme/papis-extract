@@ -5,7 +5,7 @@
 ![PyPI](https://img.shields.io/pypi/v/papis-extract)
 -->
 
-Quickly extract annotations from your pdf files with the help of the [papis](https://github.com/papis/papis) bibliography manager.\
+Quickly extract annotations from your files with the help of the [papis](https://github.com/papis/papis) bibliography manager.\
 Easily organize all your highlights and thoughts next to your documents and references.\
 
 ## Installation
