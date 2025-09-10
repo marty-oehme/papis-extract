@@ -1,0 +1,85 @@
+# pyright: strict, reportUnknownMemberType=false
+import re
+from pathlib import Path
+
+import magic
+import papis.logging
+
+from papis_extract.annotation import Annotation
+
+logger = papis.logging.get_logger(__name__)
+
+
+class ReadEraExtractor:
+    """Extracts exported annotations from the ReadEra book reading app for Android and iOS.
+
+    https://readera.org/
+    """
+
+    def can_process(self, filename: Path) -> bool:
+        if not magic.from_file(filename, mime=True) == "text/plain":
+            return False
+
+        content = self._read_file(filename)
+        if not content:
+            return False
+
+        if not content[0] or not content[1]:
+            return False
+
+        patt = re.compile(r"\n\*\*\*\*\*\n")
+        if not patt.search("".join(content)):
+            return False
+
+        logger.debug(
+            f"Found annotation file processable with ReadEraExtractor: {filename}"
+        )
+        return True
+
+    def run(self, filename: Path) -> list[Annotation]:
+        """Extract annotations from readera txt file.
+
+        Returns all readable annotations contained in the file
+        passed in, with highlights and notes if available.
+        Could theoretically return the annotation color but I
+        do not have access to a premium version of ReadEra so
+        I cannot add this feature.
+        """
+        content = self._read_file(filename)[2:]
+        if not content:
+            return []
+
+        annotations: list[Annotation] = []
+
+        split = "\n".join(content).split("\n*****\n")
+        note_pattern = re.compile(r"\n--.*")
+        for entry in split:
+            entry = entry.strip()
+            note = note_pattern.search(entry)
+            if note:
+                entry = note_pattern.sub("", entry)
+                note = re.sub(r"\n--", "", note.group())
+
+            entry = re.sub(r"\n", " ", entry)
+
+            a = Annotation(
+                file=str(filename),
+                content=entry,
+                note=note if note else "",
+                # color=color, # TODO: Implement for premium ReadEra version
+            )
+            annotations.append(a)
+
+        logger.debug(
+            f"Found {len(annotations)} "
+            f"{'annotation' if len(annotations) == 1 else 'annotations'} for {filename}."
+        )
+        return annotations
+
+    def _read_file(self, filename: Path) -> list[str]:
+        try:
+            with open(filename, encoding="utf-8") as f:
+                return f.readlines()
+        except FileNotFoundError:
+            logger.error(f"Could not open file {filename} for extraction.")
+            return []
