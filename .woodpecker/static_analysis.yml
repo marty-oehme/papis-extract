@@ -1,3 +1,6 @@
+when:
+  - event: push
+
 steps:
   pyright:
     image: ghcr.io/astral-sh/uv:python3.11-trixie-slim
