@@ -18,7 +18,7 @@ class NotesExporter:
     formatter: Formatter
     edit: bool = False
     git: bool = False
-    force: bool = False
+    duplicates: bool = False
 
     def run(self, annot_docs: list[tuple[Document, list[Annotation]]]) -> None:
         """Write annotations into document notes.
@@ -33,7 +33,7 @@ class NotesExporter:
                 doc, annots, first=True
             ).split("\n")
             if formatted_annotations:
-                self._add_annots_to_note(doc, formatted_annotations, force=self.force)
+                self._add_annots_to_note(doc, formatted_annotations, duplicates=self.duplicates)
 
             if self.edit:
                 papis.commands.edit.edit_notes(doc, git=self.git)
@@ -43,15 +43,15 @@ class NotesExporter:
         document: Document,
         formatted_annotations: list[str],
         git: bool = False,
-        force: bool = False,
+        duplicates: bool = False,
     ) -> None:
         """
         Append new annotations to the end of a note.
 
         This function appends new annotations to the end of a note file. It takes in a
         document object containing the note, a list of formatted annotations to be
-        added, and optional flags git and force. If git is True, the changes will be
-        committed to git. If force is True, the annotations will be added even if they
+        added, and optional flags git and duplicates. If git is True, the changes will be
+        committed to git. If duplicates is True, the annotations will be added even if they
         already exist in the note.
 
         :param document: The document object representing the note
@@ -60,9 +60,9 @@ class NotesExporter:
         :type formatted_annotations: list[str]
         :param git: Flag indicating whether to commit changes to git, defaults to False.
         :type git: bool, optional
-        :param force:  Flag indicating whether to force adding annotations even if they
-            already exist, defaults to False.
-        :type force: bool, optional
+        :param duplicates:  Flag indicating whether to force adding annotations as duplicates
+            even if they already exist, defaults to False.
+        :type duplicates: bool, optional
         """
         logger.debug("Adding annotations to note.")
         notes_path = papis.notes.notes_path_ensured(document)
@@ -72,7 +72,7 @@ class NotesExporter:
             existing = file_read.readlines()
 
         new_annotations: list[str] = []
-        if not force:
+        if not duplicates:
             new_annotations = self._drop_existing_annotations(
                 formatted_annotations, existing
             )

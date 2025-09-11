@@ -71,8 +71,8 @@ papis.config.register_default_settings(DEFAULT_OPTIONS)
     help="Choose which input formats to gather annotations from.  [default: all]",
 )
 @click.option(
-    "--force/--no-force",
-    "-f",
+    "--duplicates/--no-duplicates",
+    "-d",
     help="Do not drop any annotations because they already exist.",
     show_default=True,
 )
@@ -88,7 +88,7 @@ def main(
     extractors: list[str],
     output: str,
     git: bool,
-    force: bool,
+    duplicates: bool,
 ) -> None:
     """Extract annotations from any documents.
 
@@ -118,7 +118,7 @@ def main(
         git=git,
         formatter=formatter,
         extractors=[all_extractors.get(e) for e in extractors],
-        force=force,
+        duplicates=duplicates,
     )
 
 
@@ -129,7 +129,7 @@ def run(
     edit: bool = False,
     write: bool = False,
     git: bool = False,
-    force: bool = False,
+    duplicates: bool = False,
 ) -> None:
     exporter: Exporter
     if write:
@@ -137,7 +137,7 @@ def run(
             formatter=formatter or formatters["markdown-atx"],
             edit=edit,
             git=git,
-            force=force,
+            duplicates=duplicates,
         )
     else:
         exporter = all_exporters["stdout"](

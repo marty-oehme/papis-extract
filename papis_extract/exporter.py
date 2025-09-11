@@ -20,7 +20,7 @@ class Exporter(Protocol):
     formatter: Formatter
     edit: bool = False
     git: bool = False
-    force: bool = False
+    duplicates: bool = False
 
     def run(
         self, annot_docs: list[tuple[papis.document.Document, list[Annotation]]]
