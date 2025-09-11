@@ -24,11 +24,16 @@ class ReadEraExtractor:
         if not content:
             return False
 
+        # look for title and author lines up top
         if not content[0] or not content[1]:
             return False
 
-        patt = re.compile(r"\n\*\*\*\*\*\n")
-        if not patt.search("".join(content)):
+        # look for star-shaped divider pattern
+        if not re.search(r"\n\*\*\*\*\*\n", "".join(content)):
+            return False
+
+        # look for star-shaped pattern at end of file
+        if not re.search(r"\n\*\*\*\*\*\n\n$", "".join(content)):
             return False
 
         logger.debug(
