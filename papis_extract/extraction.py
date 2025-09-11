@@ -1,8 +1,6 @@
 from pathlib import Path
 from typing import Protocol
 
-import papis.config
-import papis.document
 import papis.logging
 from papis.document import Document
 

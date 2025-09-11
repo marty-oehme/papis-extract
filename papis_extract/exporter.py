@@ -1,13 +1,8 @@
 from dataclasses import dataclass
 from typing import Protocol
 
-import papis.api
-import papis.commands.edit
-import papis.config
 import papis.document
-import papis.git
 import papis.logging
-import papis.notes
 
 from papis_extract.annotation import Annotation
 from papis_extract.formatter import Formatter
