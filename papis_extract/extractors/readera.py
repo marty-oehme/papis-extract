@@ -44,11 +44,10 @@ class ReadEraExtractor:
     def run(self, filename: Path) -> list[Annotation]:
         """Extract annotations from readera txt file.
 
-        Returns all readable annotations contained in the file
-        passed in, with highlights and notes if available.
-        Could theoretically return the annotation color but I
-        do not have access to a premium version of ReadEra so
-        I cannot add this feature.
+        Returns all readable annotations contained in the file passed in, with
+        highlights and notes if available. Could theoretically return the
+        annotation color but I do not have access to a premium version of
+        ReadEra so I cannot add this feature.
         """
         content = self._read_file(filename)[2:]
         if not content:
@@ -56,7 +55,9 @@ class ReadEraExtractor:
 
         annotations: list[Annotation] = []
 
-        split = "\n".join(content).split("\n*****\n")
+        # split for *** separators and remove the last entry since it is always
+        # empty
+        split = "\n".join(content).split("\n*****\n")[:-1]
         note_pattern = re.compile(r"\n--.*")
         for entry in split:
             entry = entry.strip()
