@@ -25,7 +25,12 @@ class PdfExtractor:
         if not filename.is_file():
             logger.error(f"File {str(filename)} not readable.")
             return False
-        return self._is_pdf(filename)
+
+        if not self._is_pdf(filename):
+            return False
+
+        logger.debug(f"Found processable annotation file: {filename}")
+        return True
 
     def run(self, filename: Path) -> list[Annotation]:
         """Extract annotations from a file.

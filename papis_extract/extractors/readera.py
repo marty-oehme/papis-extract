@@ -37,7 +37,7 @@ class ReadEraExtractor:
             return False
 
         logger.debug(
-            f"Found annotation file processable with ReadEraExtractor: {filename}"
+            f"Found processable annotation file: {filename}"
         )
         return True
 

@@ -20,11 +20,13 @@ class PocketBookExtractor:
             return False
 
         html = BeautifulSoup(content, features="xml")
-        return bool(
-            html.find(
-                "meta", {"name": "generator", "content": "PocketBook Bookmarks Export"}
-            )
-        )
+        if not html.find(
+            "meta", {"name": "generator", "content": "PocketBook Bookmarks Export"}
+        ):
+            return False
+
+        logger.debug(f"Found processable annotation file: {filename}")
+        return True
 
     def run(self, filename: Path) -> list[Annotation]:
         """Extract annotations from pocketbook html file.
