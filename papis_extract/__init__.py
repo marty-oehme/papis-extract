@@ -1,4 +1,9 @@
 import re
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from papis_extract.annotation import Annotation
+    from papis_extract.exporter import Exporter
 
 import click
 import papis.cli
@@ -9,8 +14,6 @@ import papis.strings
 from papis.document import Document
 
 from papis_extract import extraction
-from papis_extract.annotation import Annotation
-from papis_extract.exporter import Exporter
 from papis_extract.exporters import all_exporters
 from papis_extract.extractors import all_extractors
 from papis_extract.formatter import Formatter, formatters

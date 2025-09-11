@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from pathlib import Path
 
 import Levenshtein
 import papis.commands.edit
@@ -69,11 +70,11 @@ class NotesExporter:
         :type duplicates: bool, optional
         """
         logger.debug("Adding annotations to note...")
-        notes_path = papis.notes.notes_path_ensured(document)
+        notes_path = Path(papis.notes.notes_path_ensured(document))
 
         existing: list[str] = []
-        with open(notes_path, "r") as file_read:
-            existing = file_read.readlines()
+        with notes_path.open("r") as fr:
+            existing = fr.readlines()
 
         new_annotations: list[str] = formatted_annotations
         if not duplicates:
@@ -81,15 +82,16 @@ class NotesExporter:
                 formatted_annotations, existing
             )
         if not new_annotations:
+            logger.debug("No new annotations to be added.")
             return
 
-        with open(notes_path, "a") as f:
+        with notes_path.open("a") as fa:
             # add newline if theres no empty space at file end
             if len(existing) > 0 and existing[-1].strip() != "":
-                f.write("\n")
+                fa.write("\n")
             # We filter out any empty lines from the annotations
             filtered_annotations = [annot for annot in new_annotations if annot != ""]
-            f.write("\n\n".join(filtered_annotations))
+            fa.write("\n\n".join(filtered_annotations))
             logger.info(
                 f"Wrote {len(filtered_annotations)} "
                 f"{'line' if len(filtered_annotations) == 1 else 'lines'} "
@@ -97,11 +99,11 @@ class NotesExporter:
             )
 
         if git:
-            msg = "Update notes for '{0}'".format(papis.document.describe(document))
+            msg = f"Update annotations for '{papis.document.describe(document)}'"
             folder = document.get_main_folder()
             if folder:
                 papis.git.add_and_commit_resources(
-                    folder, [notes_path, document.get_info_file()], msg
+                    folder, [str(notes_path), document.get_info_file()], msg
                 )
 
     def _drop_existing_annotations(

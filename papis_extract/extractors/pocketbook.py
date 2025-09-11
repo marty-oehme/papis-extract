@@ -2,7 +2,6 @@
 from pathlib import Path
 
 import magic
-import papis.config
 import papis.logging
 from bs4 import BeautifulSoup
 
@@ -13,7 +12,7 @@ logger = papis.logging.get_logger(__name__)
 
 class PocketBookExtractor:
     def can_process(self, filename: Path) -> bool:
-        if not magic.from_file(filename, mime=True) == "text/xml":
+        if magic.from_file(filename, mime=True) != "text/xml":
             return False
 
         content = self._read_file(filename)
@@ -21,11 +20,11 @@ class PocketBookExtractor:
             return False
 
         html = BeautifulSoup(content, features="xml")
-        if not html.find(
-            "meta", {"name": "generator", "content": "PocketBook Bookmarks Export"}
-        ):
-            return False
-        return True
+        return bool(
+            html.find(
+                "meta", {"name": "generator", "content": "PocketBook Bookmarks Export"}
+            )
+        )
 
     def run(self, filename: Path) -> list[Annotation]:
         """Extract annotations from pocketbook html file.
@@ -78,8 +77,8 @@ class PocketBookExtractor:
 
     def _read_file(self, filename: Path) -> str:
         try:
-            with open(filename) as f:
-                return f.read()
+            with filename.open("r") as fr:
+                return fr.read()
         except FileNotFoundError:
             logger.error(f"Could not open file {filename} for extraction.")
             return ""

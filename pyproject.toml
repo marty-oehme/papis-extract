@@ -39,6 +39,24 @@ pocketbook = ["beautifulsoup4<5.0.0,>=4.12.3"]
 [tool.uv]
 dev-dependencies = ["pytest<9.0.0,>=8.0.0", "pytest-cov<7.0.0,>=6.0.0"]
 
+[tool.ruff.lint]
+extend-select = [
+    "C4",  # Catch incorrect use of comprehensions, dict, list, etc
+    "F",   # Pyflakes rules
+    "FA",  # Enforce from __future__ import annotations
+    "I",   # Sort imports properly
+    "ICN", # Use common import conventions
+    "ISC", # Good use of string concatenation
+    "NPY", # Some numpy-specific things
+    "PTH", # Use pathlib instead of os.path
+    "RET", # Good return practices
+    "SIM", # Common simplification rules
+    "TC",  # Enforce importing certain types in a TYPE_CHECKING block
+    "TID", # Some good import practices
+    "UP",  # Warn if certain things can changed due to newer Python versions
+    "W",   # PyCodeStyle warnings
+]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

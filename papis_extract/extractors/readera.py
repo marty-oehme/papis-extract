@@ -17,7 +17,7 @@ class ReadEraExtractor:
     """
 
     def can_process(self, filename: Path) -> bool:
-        if not magic.from_file(filename, mime=True) == "text/plain":
+        if magic.from_file(filename, mime=True) != "text/plain":
             return False
 
         content = self._read_file(filename)
@@ -83,8 +83,8 @@ class ReadEraExtractor:
 
     def _read_file(self, filename: Path) -> list[str]:
         try:
-            with open(filename, encoding="utf-8") as f:
-                return f.readlines()
+            with filename.open("r") as fr:
+                return fr.readlines()
         except FileNotFoundError:
             logger.error(f"Could not open file {filename} for extraction.")
             return []

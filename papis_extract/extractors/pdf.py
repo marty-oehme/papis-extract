@@ -19,9 +19,7 @@ class PdfExtractor:
         if not filename.is_file():
             logger.error(f"File {str(filename)} not readable.")
             return False
-        if not self._is_pdf(filename):
-            return False
-        return True
+        return self._is_pdf(filename)
 
     def run(self, filename: Path) -> list[Annotation]:
         """Extract annotations from a file.
@@ -39,15 +37,15 @@ class PdfExtractor:
                         if not quote and not note:
                             continue
                         color: tuple[float, float, float] = cast(
-                            tuple[float, float, float],
+                            "tuple[float, float, float]",
                             (
                                 annot.colors.get("fill")
                                 or annot.colors.get("stroke")
                                 or (0.0, 0.0, 0.0)
                             ),
                         )
-                        page_nr: int = cast(int, page.number or 0)
-                        highlight_type: str = cast(str, annot.type[1] or "")
+                        page_nr: int = cast("int", page.number or 0)
+                        highlight_type: str = cast("str", annot.type[1] or "")
                         a = Annotation(
                             file=str(filename),
                             content=quote or "",
@@ -83,7 +81,7 @@ class PdfExtractor:
         should both be included or are the same, using
         Levenshtein distance.
         """
-        content = cast(str, annotation.info["content"].replace("\n", " "))
+        content = cast("str", annotation.info["content"].replace("\n", " "))
         written = page.get_textbox(annotation.rect).replace("\n", " ")
 
         # highlight with selection in note
@@ -94,13 +92,13 @@ class PdfExtractor:
         if Levenshtein.ratio(content, written) > minimum_similarity:
             return (content, None)
         # both a highlight and a note
-        elif content and written:
+        if content and written:
             return (written, content)
         # an independent note, not a highlight
-        elif content:
+        if content:
             return (None, content)
         # highlight with selection not in note
-        elif written:
+        if written:
             return (written, None)
         # just a highlight without any text
         return (None, None)

@@ -1,6 +1,6 @@
 import math
 from dataclasses import dataclass
-from typing import Any, Optional, cast
+from typing import Any, cast
 
 import chevron
 import papis.config
@@ -117,7 +117,7 @@ class Annotation:
         return color_mapping.get(colorname, "")
 
     # mimics the functions in papis.config.{getlist,getint,getfloat} etc.
-    def _getdict(self, key: str, section: Optional[str] = None) -> dict[str, str]:
+    def _getdict(self, key: str, section: str | None = None) -> dict[str, str]:
         """Dict getter
 
         :returns: A python dict
@@ -126,19 +126,17 @@ class Annotation:
         """
         rawvalue: Any = papis.config.general_get(key, section=section)
         if isinstance(rawvalue, dict):
-            return cast(dict[str, str], rawvalue)
+            return cast("dict[str, str]", rawvalue)
         try:
             rawvalue = eval(rawvalue)
         except Exception:
             raise SyntaxError(
-                "The key '{}' must be a valid Python object: {}".format(key, rawvalue)
+                f"The configuration key '{key}' must be a valid Python dict: {rawvalue}"
             )
         else:
             if not isinstance(rawvalue, dict):
                 raise SyntaxError(
-                    "The key '{}' must be a valid Python dict. Got: {} (type {!r})".format(
-                        key, rawvalue, type(rawvalue).__name__
-                    )
+                    f"The configuration key '{key}' must be a valid Python dict. Got: {rawvalue} (type {type(rawvalue).__name__})"
                 )
 
-            return cast(dict[str, str], rawvalue)
+            return cast("dict[str, str]", rawvalue)
