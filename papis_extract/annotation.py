@@ -1,4 +1,6 @@
 import math
+from functools import total_ordering
+from types import NotImplementedType
 from typing import Any, cast
 
 import chevron
@@ -20,6 +22,7 @@ COLORS: dict[str, tuple[float, float, float]] = {
 }
 
 
+@total_ordering
 class Annotation:
     """A PDF annotation object.
 
@@ -144,3 +147,35 @@ class Annotation:
 
     def __repr__(self) -> str:
         return f"Annotation(type={self.type}, file='{self.file}', color={self.color}, tag='{self.tag}', page={self.page}, content='{self.content}', note='{self.note}', minimum_similarity_color={self.minimum_similarity_color})"
+
+    def __eq__(self, other: object) -> bool | NotImplementedType:
+        if not isinstance(other, Annotation):
+            return NotImplemented
+
+        return (
+            self.content.lower(),
+            self.note.lower(),
+            self.type,
+            self.file,
+            self.color,
+            self.tag,
+            self.page,
+        ) == (
+            other.content.lower(),
+            other.note.lower(),
+            other.type,
+            other.file,
+            other.color,
+            other.tag,
+            other.page,
+        )
+
+    def __lt__(self, other: object) -> bool:
+        if not hasattr(other, "page"):
+            return NotImplemented
+
+        other = cast("Annotation", other)
+        selfpage = self.page if self.page != 0 else float("inf")
+        otherpage = other.page if other.page != 0 else float("inf")
+
+        return selfpage < otherpage

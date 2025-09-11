@@ -4,10 +4,40 @@ from papis.document import Document
 from papis_extract.annotation import Annotation
 
 
-def test_value_comparison_works():
+def test_value_inequality_comparison():
     sut = Annotation("myfile", content="Here be content!", note="and a note")
-    other = Annotation("myfile", content="Here be different content!", note="but still a note")
+    other = Annotation(
+        "myfile", content="Here be different content!", note="but still a note"
+    )
     assert sut != other
+
+
+def test_oder_lt_comparison():
+    sut = Annotation("myfile", content="Here be content!", note="and a note", page=2)
+    other = Annotation(
+        "myfile", content="Here be different content!", note="but still a note", page=10
+    )
+    assert sut < other
+
+
+def test_oder_ge_comparison():
+    big = Annotation("mf", content="ct", note="nt", page=10)
+    small = Annotation("mf", content="ct", note="nt", page=2)
+    alsosmall = Annotation("mf", content="ct", note="nt", page=2)
+    assert big >= small
+    assert small >= alsosmall
+
+
+def test_oder_gt_comparison_single_nopage():
+    zeropage = Annotation("mf", content="ct", note="nt", page=0)
+    small = Annotation("mf", content="ct", note="nt", page=2)
+    assert zeropage > small
+
+
+def test_oder_le_comparison_all_nopage():
+    zeropage = Annotation("mf", content="ct", note="nt", page=0)
+    small = Annotation("mf", content="ct", note="nt", page=0)
+    assert zeropage <= small
 
 
 @pytest.mark.parametrize(
