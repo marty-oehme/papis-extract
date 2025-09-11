@@ -11,7 +11,7 @@ dependencies = [
     "chevron<1.0.0,>=0.14.0",
 ]
 name = "papis-extract"
-version = "0.2.0"
+version = "0.2.1"
 description = ""
 readme = "README.md"
 keywords = [
