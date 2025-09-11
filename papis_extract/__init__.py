@@ -5,7 +5,6 @@ import papis.cli
 import papis.config
 import papis.document
 import papis.logging
-import papis.notes
 import papis.strings
 from papis.document import Document
 

@@ -1,4 +1,5 @@
 from typing import Protocol
+
 from papis.document import Document
 
 from papis_extract.annotation import Annotation

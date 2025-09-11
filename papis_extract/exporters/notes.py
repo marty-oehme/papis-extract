@@ -1,14 +1,16 @@
 from dataclasses import dataclass
+
 import Levenshtein
-from papis.document import Document
-from papis_extract.annotation import Annotation
-from papis_extract.formatter import Formatter
-from papis.logging import get_logger
-import papis.notes
+import papis.commands.edit
+import papis.config
 import papis.document
 import papis.git
-import papis.config
-import papis.commands.edit
+import papis.notes
+from papis.document import Document
+from papis.logging import get_logger
+
+from papis_extract.annotation import Annotation
+from papis_extract.formatter import Formatter
 
 logger = get_logger(__name__)
 
@@ -33,7 +35,9 @@ class NotesExporter:
                 doc, annots, first=True
             ).split("\n")
             if formatted_annotations:
-                self._add_annots_to_note(doc, formatted_annotations, duplicates=self.duplicates)
+                self._add_annots_to_note(
+                    doc, formatted_annotations, duplicates=self.duplicates
+                )
 
             if self.edit:
                 papis.commands.edit.edit_notes(doc, git=self.git)
@@ -83,12 +87,12 @@ class NotesExporter:
             # add newline if theres no empty space at file end
             if len(existing) > 0 and existing[-1].strip() != "":
                 f.write("\n")
-            # FIXME this either joins them too close or moves them too far apart
-            # We need a better algorithm which knows what a full 'annotation' is.
-            f.write("\n\n".join(new_annotations))
+            # We filter out any empty lines from the annotations
+            filtered_annotations = [annot for annot in new_annotations if annot != ""]
+            f.write("\n\n".join(filtered_annotations))
             logger.info(
-                f"Wrote {len(new_annotations)} "
-                f"{'line' if len(new_annotations) == 1 else 'lines'} "
+                f"Wrote {len(filtered_annotations)} "
+                f"{'line' if len(filtered_annotations) == 1 else 'lines'} "
                 f"to {papis.document.describe(document)}"
             )
 
@@ -106,7 +110,7 @@ class NotesExporter:
         """Returns the input annotations dropping any existing.
 
         Takes a list of formatted annotations and a list of strings
-        (most probably existing lines in a file). If anny annotations
+        (most probably existing lines in a file). If any annotations
         match an existing line closely enough, they will be dropped.
 
         Returns list of annotations without duplicates.

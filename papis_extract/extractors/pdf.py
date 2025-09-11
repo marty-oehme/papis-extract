@@ -32,9 +32,7 @@ class PdfExtractor:
         annotations: list[Annotation] = []
         try:
             with mu.Document(filename) as doc:
-                for (
-                    page
-                ) in doc:  # pyright: ignore [reportUnknownVariableType] - missing stub
+                for page in doc:  # pyright: ignore [reportUnknownVariableType] - missing stub
                     annot: mu.Annot
                     for annot in page.annots():
                         quote, note = self._retrieve_annotation_content(page, annot)
