@@ -64,14 +64,14 @@ class NotesExporter:
             even if they already exist, defaults to False.
         :type duplicates: bool, optional
         """
-        logger.debug("Adding annotations to note.")
+        logger.debug("Adding annotations to note...")
         notes_path = papis.notes.notes_path_ensured(document)
 
         existing: list[str] = []
         with open(notes_path, "r") as file_read:
             existing = file_read.readlines()
 
-        new_annotations: list[str] = []
+        new_annotations: list[str] = formatted_annotations
         if not duplicates:
             new_annotations = self._drop_existing_annotations(
                 formatted_annotations, existing
@@ -85,8 +85,7 @@ class NotesExporter:
                 f.write("\n")
             # FIXME this either joins them too close or moves them too far apart
             # We need a better algorithm which knows what a full 'annotation' is.
-            f.write("\n".join(new_annotations))
-            f.write("\n")
+            f.write("\n\n".join(new_annotations))
             logger.info(
                 f"Wrote {len(new_annotations)} "
                 f"{'line' if len(new_annotations) == 1 else 'lines'} "
