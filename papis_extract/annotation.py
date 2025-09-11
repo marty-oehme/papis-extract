@@ -1,5 +1,4 @@
 import math
-from dataclasses import dataclass
 from typing import Any, cast
 
 import chevron
@@ -21,7 +20,6 @@ COLORS: dict[str, tuple[float, float, float]] = {
 }
 
 
-@dataclass
 class Annotation:
     """A PDF annotation object.
 
@@ -140,3 +138,9 @@ class Annotation:
                 )
 
             return cast("dict[str, str]", rawvalue)
+
+    def __str__(self) -> str:
+        return f"Annotation({self.type}: '{self.file}', color: {self.color}, tag: '{self.tag}', page: {self.page}, content: '{self.content}', note: '{self.note}', minimum_similarity_color: {self.minimum_similarity_color})"
+
+    def __repr__(self) -> str:
+        return f"Annotation(type={self.type}, file='{self.file}', color={self.color}, tag='{self.tag}', page={self.page}, content='{self.content}', note='{self.note}', minimum_similarity_color={self.minimum_similarity_color})"

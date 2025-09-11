@@ -4,6 +4,12 @@ from papis.document import Document
 from papis_extract.annotation import Annotation
 
 
+def test_value_comparison_works():
+    sut = Annotation("myfile", content="Here be content!", note="and a note")
+    other = Annotation("myfile", content="Here be different content!", note="but still a note")
+    assert sut != other
+
+
 @pytest.mark.parametrize(
     "fmt_string,expected",
     [
