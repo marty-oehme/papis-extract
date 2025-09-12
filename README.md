@@ -1,6 +1,7 @@
 # papis-extract
 
 [![status-badge](https://ci.martyoeh.me/api/badges/Marty/papis-extract/status.svg)](https://ci.martyoeh.me/Marty/papis-extract)
+
 <!-- TODO have to set up pypi badge
 ![PyPI](https://img.shields.io/pypi/v/papis-extract)
 -->
@@ -11,6 +12,7 @@ Easily organize all your highlights and thoughts next to your documents and refe
 ## Installation
 
 <!-- TODO set up pypi repository / explain git install path -->
+
 You can install through pip with `pip install git+https://git.martyoeh.me/Marty/papis-extract.git`.
 
 That's it! If you have papis and papis-extract installed in the same environment (whether virtual or global),
@@ -26,7 +28,7 @@ You will be set up with the default options but if you want to change anything, 
 
 > **Note**
 > This plugin is still in fairly early development.
-> It does what I need it to do, but if you have a meticulously organized library *please* make backups before doing any operation which could affect your notes, or make use of the papis-included git options.
+> It does what I need it to do, but if you have a meticulously organized library _please_ make backups before doing any operation which could affect your notes, or make use of the papis-included git options.
 > Take care to read the Issues section of this README if you intend to run it over a large collection.
 
 ## Usage
@@ -66,7 +68,7 @@ use `--all` as usual with papis:
 papis extract --all "author:Einstein"
 ```
 
-The above command will print out your annotations made on *all* papers by Einstein.
+The above command will print out your annotations made on _all_ papers by Einstein.
 
 You can invoke the command with `--manual` to instantly edit the notes in your editor:
 
@@ -85,7 +87,7 @@ papis extract --write --all
 ```
 
 However, the warning for your notes' safety goes doubly for this command since it will touch
-*most* or *all* of your notes, depending on how many entries in your library have pdfs with annotations attached.
+_most_ or _all_ of your notes, depending on how many entries in your library have pdfs with annotations attached.
 
 While I have not done extensive optimizations the process should be relatively quick even for larger libraries:
 On my current laptop, extracting ~4000 annotations from ~1000 library documents takes around 90 seconds,
@@ -116,7 +118,7 @@ papis extract --output count
 
 For now, these are the only formatters the plugin knows about.
 
-Be aware that if you re-write to your notes using a completely different output format than the original the plugin will *not* detect old annotations and drop them,
+Be aware that if you re-write to your notes using a completely different output format than the original the plugin will _not_ detect old annotations and drop them,
 so you will be doubling up your annotations.
 See the `minimum_similarity` configuration option for more details.
 
@@ -150,7 +152,7 @@ If you set `on_import` to `True`,
 extraction into notes is automatically run whenever a new document is added to the library,
 if `False` extraction only happens when you explicitly invoke it.
 
-Extraction will *not* happen automatically when you add new annotations to an existing document,
+Extraction will _not_ happen automatically when you add new annotations to an existing document,
 regardless of this setting.
 
 > **Note**
@@ -190,11 +192,11 @@ Generally, this should be fine as it is but you should change this value if you 
 
 ---
 
-`minimum_similarity_content` sets the required similarity of an annotation's note and in-pdf written words to be viewed as one. Any annotation that has both and is *under* the minimum similarity will be added in the following form:
+`minimum_similarity_content` sets the required similarity of an annotation's note and in-pdf written words to be viewed as one. Any annotation that has both and is _under_ the minimum similarity will be added in the following form:
 
 ```markdown
 > my annotation
-Note: my additional thoughts
+> Note: my additional thoughts
 ```
 
 That is, the extractor detects additional written words by whoever annotated and adds them to the extraction.
@@ -232,12 +234,12 @@ A note on the extraction: Highlights in pdfs can be somewhat difficult to parse
 (as are most things in them). Sometimes they contain the selected text that is written on the
 page, sometimes they contain the annotators thoughts as a note, sometimes they contain nothing.
 This plugin makes an effort to find the right combination and extract the written words,
-as well as any additional notes made - but things *will* slip through or extract weirdly every now
+as well as any additional notes made - but things _will_ slip through or extract weirdly every now
 and again.
 
 Secondly, a note on the pages: I use the page number that the mupdf library gives me when it
 extracts anything from the pdf file. Sometimes that number will be correct for the document,
-sometimes it will however be the number of the *pdf document* internally. This can happen if
+sometimes it will however be the number of the _pdf document_ internally. This can happen if
 e.g. an article or a book has frontmatter without numbering scheme or with a different one.
 Sometimes the correct pages will still be embedded in the pdf and everything will work,
 others it won't. So always double check your page numbers!
@@ -249,19 +251,19 @@ I am not sure if there is much I can do about these issues for now.
 and for myself whenever I forget. The basic building blocks currently in here are three:
 
 - extractors (= input format)
-: Extract data from a source file attached to a papis document.
+  : Extract data from a source file attached to a papis document.
   Crawls the actual files attached to documents to put them into annotation-friendly formats.
 
 - formatters (= output format)
-: Make sure the exporter saves the annotation data according to your preferred layout,
+  : Make sure the exporter saves the annotation data according to your preferred layout,
   such as a markdown syntax or csv-structure.
 
 - annotations
-: The actual extracted blocks of text, containing some metadata
+  : The actual extracted blocks of text, containing some metadata
   info as well, such as their color, type, page.
 
 - exporters
-: Put the extracted data somewhere. For now stdout or into your notes.
+  : Put the extracted data somewhere. For now stdout or into your notes.
 
 Splitting it into those building blocks makes it easier to recombine them in any way,
 should someone want to save highlights as csv data in their notes,
@@ -280,7 +282,7 @@ However, what I do on my system instead to enable quick testing is inject it int
 system-wide (but isolated with `pipx`) papis setup:
 
 ```bash
-pipx install papis # create an isolated papis installation reachable form anywhere
+pipx install papis             # create an isolated papis installation reachable form anywhere
 pipx inject --editable papis . # inject this folder into the environment and keep up with any changes
 ```
 
