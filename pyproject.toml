@@ -62,3 +62,11 @@ build-backend = "hatchling.build"
 
 [tool.pyright]
 typeCheckingMode = "strict"
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    # see https://github.com/swig/swig/issues/2881#issuecomment-2877988848
+    # should hopefully be redundant with swig-4.4
+    "ignore:.*builtin type SwigPy\\w* has no __module__ attribute.*:DeprecationWarning",
+    "ignore:.*builtin type swigvarlink has no __module__ attribute.*:DeprecationWarning"
+]
