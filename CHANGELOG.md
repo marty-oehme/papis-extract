@@ -6,11 +6,21 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- Add Readest extractor
+
 ### Changed
+
+- Extend minimum Python version support to Python 3.10
+- Extract ROADMAP from README
 
 ### Fixed
 
+- Fix uv-enabled CI pipeline
+- Do not parse last empty annotation for ReadEra
+
 ### Removed
+
+- libmagic dependency
 
 ## [0.2.1]
 
