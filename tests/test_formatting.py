@@ -1,6 +1,6 @@
 from papis.document import Document
-from papis_extract.annotation import Annotation
 
+from papis_extract.annotation import Annotation
 from papis_extract.formatter import (
     format_count,
     format_csv,
