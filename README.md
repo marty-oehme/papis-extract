@@ -220,55 +220,6 @@ Then import the resulting `.html` file into the library like any other document 
 (or `papis addto` to add it to existing document references).
 You are then ready to use extract to get those annotations from the exported list into your notes.
 
-## TODO: Roadmap to first release
-
-Known issues to be fixed:
-
-- [x] if both content and text are empty, do not extract an annotation
-- [x] Speed?
-    - should be fine, on my machine (old i5 laptop) it takes around 90s for ~1000 documents with ~4000 annotations
-- [x] ensure all cmdline options do what they should
-- [x] annotations carry over color object from fitz, should just be Color object or simple tuple with rgb vals
-- [x] docstrings, docstrings!
-- [ ] testing testing testing!!
-    - [ ] refactor into some better abstractions (e.g. Exporter Protocol -> stdout/markdown implementations; Extractor Protocol -> PDF implementation)
-- [ ] dependency injection for extractor/exporter/formatter/annotation modules
-    - [ ] any call to papis.config should start from init and be injected?
-
-features to be implemented:
-
-- [ ] CICD
-    - [x] static analysis (lint, typecheck etc) on pushes
-    - [x] test pipeline on master pushes
-    - [ ] release pipeline to pypi on tags
-- [x] add page number if available
-    - exists in Annotation, just need to place in output
-- [ ] show overall amount of extractions at the end
-    - implemented for writing to notes (notes exporter)
-    - KNOWN ISSUE: currently returns number of annotation rows (may be multiple per annot)
-- [ ] custom formatting decided by user
-    - in config as { "myformatter": ">{tag}\n{quote}\n{note}\n{page} etc"}
-- [ ] improved default exporters
-    - [x] markdown into notes
-    - [ ] pretty display on stdout (rich?)
-    - [x] csv/tsv to stdout
-    - [ ] table fmt stdout?
-- [ ] allow custom colors -> tag name settings not dependent on color name existing (e.g. {"important": (1.0,0.0,0.0)})
-- [ ] `--overwrite` mode where existing annotations are not dropped but overwritten on same line of note
-- [x] `--force` mode where we simply do not drop anything
-- [x] `--format` option to choose from default or set up a custom formatter
-    - called `--output` in current implementation
-- [ ] on_add hook to extract annotations as files are added
-    - needs upstream help, 'on_add' hook, and pass-through of affected documents
-- [ ] target same minimum Python version as papis upstream (3.8 as of papis 0.13)
-- [ ] change detection:
-    - how does it handle updated citations? updated colors? should it be configurable?
-
-upstream changes:
-
-- [ ] need a hook for adding a document/file
-- [ ] need hooks to actually pass through information on the thing they worked on (i.e. their document)
-
 ## Issues
 
 First, a note in general: There is the functionality to run this plugin over your whole library in a single command and also in a way that makes permanent changes to that library.
