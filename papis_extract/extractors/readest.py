@@ -2,12 +2,14 @@
 import re
 from pathlib import Path
 
-import magic
 import papis.logging
 
 from papis_extract.annotation import Annotation
 
 logger = papis.logging.get_logger(__name__)
+
+ACCEPTED_EXTENSIONS = [".txt", ".md", ".qmd", ".rmd"]
+TEXTCHARS = bytearray({7, 8, 9, 10, 12, 13, 27} | set(range(0x20, 0x100)) - {0x7F})
 
 
 class ReadestExtractor:
@@ -17,7 +19,7 @@ class ReadestExtractor:
     """
 
     def can_process(self, filename: Path) -> bool:
-        if magic.from_file(filename, mime=True) != "text/plain":
+        if not self._is_readable_text(filename):
             return False
 
         content = self._read_file(filename)
@@ -32,6 +34,22 @@ class ReadestExtractor:
 
         logger.debug(f"Found processable annotation file: {filename}")
         return True
+
+    def _is_readable_text(self, filename: Path) -> bool:
+        """Checks whether a file has a valid text extension and is not a binary file.
+
+        A file is considered a valid text file if its extension is in
+        :data:`ACCEPTED_EXTENSIONS` and does not contain any non-text characters.
+
+        :returns: A boolean indicating whether the file is a valid text file.
+        """
+        if filename.suffix not in ACCEPTED_EXTENSIONS:
+            return False
+        try:
+            with filename.open("rb") as rb:
+                return not bool(rb.read(1024).translate(None, TEXTCHARS))
+        except (FileNotFoundError, PermissionError):
+            return False
 
     def run(self, filename: Path) -> list[Annotation]:
         """Extract annotations from readest txt file.

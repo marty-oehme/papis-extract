@@ -1,7 +1,7 @@
 # pyright: strict, reportUnknownMemberType=false
+import mimetypes
 from pathlib import Path
 
-import magic
 import papis.logging
 from bs4 import BeautifulSoup
 
@@ -12,7 +12,7 @@ logger = papis.logging.get_logger(__name__)
 
 class PocketBookExtractor:
     def can_process(self, filename: Path) -> bool:
-        if magic.from_file(filename, mime=True) != "text/xml":
+        if not self._is_html(filename):
             return False
 
         content = self._read_file(filename)
@@ -27,6 +27,9 @@ class PocketBookExtractor:
 
         logger.debug(f"Found processable annotation file: {filename}")
         return True
+
+    def _is_html(self, filename: Path) -> bool:
+        return mimetypes.guess_type(filename)[0] == "text/html"
 
     def run(self, filename: Path) -> list[Annotation]:
         """Extract annotations from pocketbook html file.

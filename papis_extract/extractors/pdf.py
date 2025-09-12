@@ -1,10 +1,10 @@
 # pyright: strict, reportMissingTypeStubs=false, reportUnknownMemberType=false
+import mimetypes
 from collections.abc import Generator
 from pathlib import Path
 from typing import NamedTuple, cast
 
 import Levenshtein
-import magic
 import papis.config
 import papis.logging
 import pymupdf as mu
@@ -77,7 +77,7 @@ class PdfExtractor:
 
     def _is_pdf(self, fname: Path) -> bool:
         """Check if file is a pdf, using mime type."""
-        return magic.from_file(fname, mime=True) == "application/pdf"
+        return mimetypes.guess_type(fname)[0] == "application/pdf"
 
     def _get_annotation_content(
         self, page: mu.Page, annotation: mu.Annot

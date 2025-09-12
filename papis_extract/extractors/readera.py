@@ -1,8 +1,8 @@
 # pyright: strict, reportUnknownMemberType=false
+import mimetypes
 import re
 from pathlib import Path
 
-import magic
 import papis.logging
 
 from papis_extract.annotation import Annotation
@@ -17,7 +17,7 @@ class ReadEraExtractor:
     """
 
     def can_process(self, filename: Path) -> bool:
-        if magic.from_file(filename, mime=True) != "text/plain":
+        if not self._is_txt(filename):
             return False
 
         content = self._read_file(filename)
@@ -36,10 +36,11 @@ class ReadEraExtractor:
         if not re.search(r"\n\*\*\*\*\*\n\n$", "".join(content)):
             return False
 
-        logger.debug(
-            f"Found processable annotation file: {filename}"
-        )
+        logger.debug(f"Found processable annotation file: {filename}")
         return True
+
+    def _is_txt(self, filename: Path) -> bool:
+        return mimetypes.guess_type(filename)[0] == "text/plain"
 
     def run(self, filename: Path) -> list[Annotation]:
         """Extract annotations from readera txt file.
