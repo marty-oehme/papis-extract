@@ -1,6 +1,7 @@
 # pyright: strict, reportUnknownMemberType=false
 import mimetypes
 from pathlib import Path
+from typing import cast
 
 import papis.logging
 from bs4 import BeautifulSoup
@@ -48,16 +49,14 @@ class PocketBookExtractor:
         annotations: list[Annotation] = []
         for bm in html.select("div.bookmark"):
             content = str(
-                (bm.select_one("div.bm-text>p") or html.new_string("")).text or ""  # pyright: ignore [reportUnknownArgumentType]
+                (bm.select_one("div.bm-text>p") or html.new_string("")).text or ""
             )
             note = str(
-                (bm.select_one("div.bm-note>p") or html.new_string("")).text or ""  # pyright: ignore [reportUnknownArgumentType]
+                (bm.select_one("div.bm-note>p") or html.new_string("")).text or ""
             )
-            page = int(
-                (bm.select_one("p.bm-page") or html.new_string("")).text or 0  # pyright: ignore [reportUnknownArgumentType]
-            )
+            page = int((bm.select_one("p.bm-page") or html.new_string("")).text or 0)
 
-            el_classes = bm.attrs.get("class", "").split(" ")
+            el_classes = cast("str", bm.attrs.get("class", "")).split(" ")
             color = (0, 0, 0)
             for c in el_classes:
                 if "bm-color-" in c:
