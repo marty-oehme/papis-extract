@@ -1,16 +1,16 @@
 steps:
   lint_ruff:
-    image: python
+    image: ghcr.io/astral-sh/uv:python3.11-trixie-slim
     commands:
-      - pip install ruff
-      - python --version && poetry --version && ruff --version
+      - uv tool install ruff
+      - python --version && uv --version && ruff --version
       - echo "----------------- running ruff lint ------------------"
       - ruff check .
 
-  lint_black:
-    image: python
+  format_ruff:
+    image: ghcr.io/astral-sh/uv:python3.11-trixie-slim
     commands:
-      - pip install black
-      - python --version && poetry --version && black --version
-      - echo "----------------- running black lint ----------------"
-      - black --check .
+      - uv tool install ruff
+      - python --version && uv --version && ruff --version
+      - echo "----------------- running ruff format ------------------"
+      - ruff format --check .

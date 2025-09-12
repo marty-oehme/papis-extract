@@ -1,9 +1,9 @@
 steps:
   pyright:
-    image: nikolaik/python-nodejs
+    image: ghcr.io/astral-sh/uv:python3.11-trixie-slim
     commands:
-      - npm install --global pyright
-      - uv sync
-      - python --version && uv version && pyright --version
+      - uv tool install pyright
+      - uv sync --locked
+      - python --version && uv --version && pyright --version
       - echo "------------- running pyright typecheck -------------"
       - uv run pyright

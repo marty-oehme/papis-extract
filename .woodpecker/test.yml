@@ -3,9 +3,9 @@ when:
 
 steps:
   pytest:
-    image: nikolaik/python-nodejs
+    image: ghcr.io/astral-sh/uv:python3.11-trixie-slim
     commands:
-      - uv sync
-      - python --version && uv version
+      - uv sync --locked
+      - python --version && uv --version
       - echo "------------- running pytest -------------"
       - uv run pytest
