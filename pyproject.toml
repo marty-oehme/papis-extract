@@ -35,8 +35,11 @@ extract = "papis_extract:main"
 whoosh = ["whoosh<3.0.0,>=2.7.4"]
 pocketbook = ["beautifulsoup4<5.0.0,>=4.12.3"]
 
-[tool.uv]
-dev-dependencies = ["pytest<9.0.0,>=8.0.0", "pytest-cov<7.0.0,>=6.0.0"]
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+    "pytest-cov>=7.1.0",
+]
 
 [tool.ruff.lint]
 extend-select = [
