@@ -9,9 +9,6 @@ from papis_extract.formatter import Formatter
 @dataclass
 class StdoutExporter:
     formatter: Formatter
-    edit: bool = False
-    git: bool = False
-    duplicates: bool = False
 
     def run(self, annot_docs: list[tuple[Document, list[Annotation]]]) -> None:
         """Pretty print annotations to stdout.
