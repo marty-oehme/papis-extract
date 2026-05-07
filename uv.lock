@@ -563,7 +563,7 @@ wheels = [
 
 [[package]]
 name = "papis"
-version = "0.14.1"
+version = "0.15.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "arxiv" },
@@ -584,11 +584,11 @@ dependencies = [
     { name = "python-slugify" },
     { name = "pyyaml" },
     { name = "requests" },
-    { name = "stevedore" },
+    { name = "setuptools" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/7a/d3/2b346625aa3803e47b9faa82b1a66a824e91c43cf45e5b228009060fb666/papis-0.14.1.tar.gz", hash = "sha256:1970e549d8931d560b283bdc883a744f1634afbf23bad8eb244dfa967f66ba78", size = 1160404, upload-time = "2025-03-01T08:26:44.091Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/70/22/365efb048e5a99a71d912acf95fd73b0a974a8df20487683817bf6ed44e6/papis-0.15.0.tar.gz", hash = "sha256:9d0e319a4e04388bc1f705c272b607aaf2b678e33530bff64b1a58bc1364b788", size = 1247460, upload-time = "2026-02-08T18:06:41.137Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e4/a5/a3a3ca0debe192f4d6b057858ac267e1737a369e2b9887c04fc7c4a47bb9/papis-0.14.1-py3-none-any.whl", hash = "sha256:a729d8c84c619fe172bc636fa9e3a285919cafc14caedb53cf69b0a26ed7d64a", size = 256370, upload-time = "2025-03-01T08:26:42.114Z" },
+    { url = "https://files.pythonhosted.org/packages/c9/f0/e562ba7952944e23a8de575337d3fda84d5628a2629a68c84c6c5ee68341/papis-0.15.0-py3-none-any.whl", hash = "sha256:75cf659fe4b8cbb1a29a0819b6552fe7f7945b3c25ca6d58e4c6c8dcf7052525", size = 293243, upload-time = "2026-02-08T18:06:39.478Z" },
 ]
 
 [[package]]
@@ -624,7 +624,7 @@ requires-dist = [
     { name = "chevron", specifier = ">=0.14.0,<1.0.0" },
     { name = "click", specifier = ">=8.1.7,<9.0.0" },
     { name = "levenshtein", specifier = ">=0.25.1,<1.0.0" },
-    { name = "papis", specifier = ">=0.14,<1.0" },
+    { name = "papis", specifier = ">=0.15,<1.0" },
     { name = "pymupdf", specifier = ">=1.24.2,<2.0.0" },
     { name = "python-magic", specifier = ">=0.4.27,<1.0.0" },
     { name = "whoosh", marker = "extra == 'whoosh'", specifier = ">=2.7.4,<3.0.0" },
@@ -918,6 +918,15 @@ wheels = [
 ]
 
 [[package]]
+name = "setuptools"
+version = "82.0.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/4f/db/cfac1baf10650ab4d1c111714410d2fbb77ac5a616db26775db562c8fab2/setuptools-82.0.1.tar.gz", hash = "sha256:7d872682c5d01cfde07da7bccc7b65469d3dca203318515ada1de5eda35efbf9", size = 1152316, upload-time = "2026-03-09T12:47:17.221Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9d/76/f789f7a86709c6b087c5a2f52f911838cad707cc613162401badc665acfe/setuptools-82.0.1-py3-none-any.whl", hash = "sha256:a59e362652f08dcd477c78bb6e7bd9d80a7995bc73ce773050228a348ce2e5bb", size = 1006223, upload-time = "2026-03-09T12:47:15.026Z" },
+]
+
+[[package]]
 name = "sgmllib3k"
 version = "1.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -939,15 +948,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/6d/e6/21ccce3262dd4889aa3332e5a119a3491a95e8f60939870a3a035aabac0d/soupsieve-2.8.tar.gz", hash = "sha256:e2dd4a40a628cb5f28f6d4b0db8800b8f581b65bb380b97de22ba5ca8d72572f", size = 103472, upload-time = "2025-08-27T15:39:51.78Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/14/a0/bb38d3b76b8cae341dad93a2dd83ab7462e6dbcdd84d43f54ee60a8dc167/soupsieve-2.8-py3-none-any.whl", hash = "sha256:0cc76456a30e20f5d7f2e14a98a4ae2ee4e5abdc7c5ea0aafe795f344bc7984c", size = 36679, upload-time = "2025-08-27T15:39:50.179Z" },
-]
-
-[[package]]
-name = "stevedore"
-version = "5.5.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/2a/5f/8418daad5c353300b7661dd8ce2574b0410a6316a8be650a189d5c68d938/stevedore-5.5.0.tar.gz", hash = "sha256:d31496a4f4df9825e1a1e4f1f74d19abb0154aff311c3b376fcc89dae8fccd73", size = 513878, upload-time = "2025-08-25T12:54:26.806Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/80/c5/0c06759b95747882bb50abda18f5fb48c3e9b0fbfc6ebc0e23550b52415d/stevedore-5.5.0-py3-none-any.whl", hash = "sha256:18363d4d268181e8e8452e71a38cd77630f345b2ef6b4a8d5614dac5ee0d18cf", size = 49518, upload-time = "2025-08-25T12:54:25.445Z" },
 ]
 
 [[package]]
