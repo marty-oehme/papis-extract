@@ -98,7 +98,6 @@ class Annotation:
         page: int = 0,
         tag: str = "",
         type: str = "Highlight",
-        minimum_similarity_color: float = COLOR_SIMILARITY_MINIMUM_FALLBACK,
     ) -> None:
         """Initialize an Annotation.
 
@@ -110,15 +109,12 @@ class Annotation:
             page: The page number where the annotation appears.
             tag: A user-defined tag derived from the annotation color.
             type: The annotation type, e.g. ``"Highlight"`` or ``"Note"``.
-            minimum_similarity_color: Minimum color similarity ratio for
-                matching the annotation color to a named color.
         """
         self.file = file
         self._color = color
         self.content = content
         self.note = note
         self.page = page
-        self.minimum_similarity_color = minimum_similarity_color
         self.tag = tag
         self.type = type
 
@@ -149,44 +145,13 @@ class Annotation:
     def color(self, value: tuple[float, float, float]):
         self._color = value
 
-    @property
-    def colorname(self):
-        """Return the stringified version of the annotation color.
-
-        Finds the closest named color to the annotation and returns it,
-        using euclidian distance between the two color vectors.
-        """
-        annot_colors = self.color or (0.0, 0.0, 0.0)
-        nearest = None
-        minimum_similarity = self.minimum_similarity_color
-        for name, values in COLORS.items():
-            similarity_ratio = self._color_similarity_ratio(values, annot_colors)
-            if similarity_ratio >= minimum_similarity:
-                minimum_similarity = similarity_ratio
-                nearest = name
-        return nearest
-
-    def _color_similarity_ratio(
-        self,
-        color_one: tuple[float, float, float],
-        color_two: tuple[float, float, float],
-    ) -> float:
-        """Return the similarity of two colors between 0 and 1.
-
-        Takes two rgb color tuples made of floats between 0 and 1,
-        e.g. (1, 0.65, 0) for orange, and returns the similarity
-        between them, with 1 being the same color and 0 being the
-        difference between full black and full white, as a float.
-        """
-        return 1 - (abs(math.dist([*color_one], [*color_two])) / 3)
-
     def __str__(self) -> str:
         """Return a human-readable string representation of the annotation."""
-        return f"Annotation({self.type}: '{self.file}', color: {self.color}, tag: '{self.tag}', page: {self.page}, content: '{self.content}', note: '{self.note}', minimum_similarity_color: {self.minimum_similarity_color})"
+        return f"Annotation({self.type}: '{self.file}', color: {self.color}, tag: '{self.tag}', page: {self.page}, content: '{self.content}', note: '{self.note}')"
 
     def __repr__(self) -> str:
         """Return an unambiguous developer-oriented string representation."""
-        return f"Annotation(type={self.type}, file='{self.file}', color={self.color}, tag='{self.tag}', page={self.page}, content='{self.content}', note='{self.note}', minimum_similarity_color={self.minimum_similarity_color})"
+        return f"Annotation(type={self.type}, file='{self.file}', color={self.color}, tag='{self.tag}', page={self.page}, content='{self.content}', note='{self.note}')"
 
     def __eq__(self, other: object) -> bool | NotImplementedType:
         """Return True if two annotations have identical content and metadata.

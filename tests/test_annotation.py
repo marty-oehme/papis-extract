@@ -1,7 +1,11 @@
 import pytest
 from papis.document import Document
 
-from papis_extract.annotation import Annotation
+from papis_extract.annotation import (
+    Annotation,
+    get_color_tag_mapping,
+    tag_from_color,
+)
 
 
 def test_value_inequality_comparison():
@@ -83,24 +87,29 @@ def test_formatting_document_access(fmt_string: str, expected: str):
     assert sut.format(fmt_string, doc=doc) == expected
 
 
-def test_colorname_matches_exact():
-    sut = Annotation("testfile", color=(1.0, 0.0, 0.0), minimum_similarity_color=1.0)
-    c_name = sut.colorname
-    assert c_name == "red"
+def test_tag_from_color_exact_match():
+    mapping = {"red": "important"}
+    result = tag_from_color((1.0, 0.0, 0.0), mapping, minimum_similarity=1.0)
+    assert result == "important"
 
 
-# TODO inject closeness value instead of relying on default
-@pytest.mark.parametrize(
-    "color_value",
-    [
-        (1.0, 0.0, 0.0),
-        (0.9, 0.0, 0.0),
-        (0.8, 0.0, 0.0),
-        (0.7, 0.0, 0.0),
-        (0.51, 0.0, 0.0),
-    ],
-)
-def test_matches_inexact_colorname(color_value: tuple[float, float, float]):
-    sut = Annotation("testfile", color=color_value, minimum_similarity_color=0.833)
-    c_name = sut.colorname
-    assert c_name == "red"
+def test_tag_from_color_close_match_above_threshold():
+    mapping = {"red": "important"}
+    result = tag_from_color((0.9, 0.0, 0.0), mapping, minimum_similarity=0.833)
+    assert result == "important"
+
+
+def test_tag_from_color_close_match_below_threshold():
+    mapping = {"red": "important"}
+    result = tag_from_color((0.5, 0.0, 0.0), mapping, minimum_similarity=0.99)
+    assert result == ""
+
+
+def test_tag_from_color_no_mapping():
+    result = tag_from_color((1.0, 0.0, 0.0), None)
+    assert result == ""
+
+
+def test_tag_from_color_empty_mapping():
+    result = tag_from_color((1.0, 0.0, 0.0), {})
+    assert result == ""
