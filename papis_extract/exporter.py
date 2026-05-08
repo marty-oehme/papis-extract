@@ -1,3 +1,9 @@
+"""Exporter Protocol is the final stage of the extraction pipeline.
+
+Exporters receive document/annotation pairs and write them to a
+destination (stdout, notes files, etc.).
+"""
+
 from typing import Protocol
 
 import papis.document
@@ -15,4 +21,6 @@ class Exporter(Protocol):
 
     def run(
         self, annot_docs: list[tuple[papis.document.Document, list[Annotation]]]
-    ) -> None: ...
+    ) -> None:
+        """Write formatted annotations to the configured destination."""
+        ...

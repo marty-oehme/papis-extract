@@ -1,3 +1,5 @@
+"""Export formatted annotations into papis document notes."""
+
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -18,6 +20,14 @@ logger = get_logger(__name__)
 
 @dataclass
 class NotesExporter:
+    """Write formatted annotations into papis document notes files.
+
+    Appends formatted annotations to each document's notes file.
+    Supports deduplication (skip annotations that already exist),
+    optional editing after writing, and git integration. Format-level
+    headers (e.g., CSV column names) are prepended per file.
+    """
+
     formatter: Formatter
     edit: bool = False
     git: bool = False
@@ -110,7 +120,7 @@ class NotesExporter:
     def _drop_existing_annotations(
         self, formatted_annotations: list[str], file_lines: list[str]
     ) -> list[str]:
-        """Returns the input annotations dropping any existing.
+        """Return the input annotations, dropping any that already exist.
 
         Takes a list of formatted annotations and a list of strings
         (most probably existing lines in a file). If any annotations
