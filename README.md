@@ -6,16 +6,17 @@
 ![PyPI](https://img.shields.io/pypi/v/papis-extract)
 -->
 
-> **Warning**
-> Papis v0.15.0 has just been released, this plugin will not work with it yet.
-> Stay on v0.14.1 if you wish to make use of this plugin.
->
-> The new version has removed the stevedore plugin library on which this plugin
-> relied. I am not sure how much effort the migration to the new plugin style will
-> be but it will no doubt take a bit until I can get started on it.
-
 Quickly extract annotations from your files with the help of the [papis](https://github.com/papis/papis) bibliography manager.\
 Easily organize all your highlights and thoughts next to your documents and references.\
+Extract from PDFs, a variety of ebook formats, or implement your own exporters for any other format.
+
+> **Warning**
+> Papis v0.15.0 has been released. This plugin now tracks that version and
+> will _not_ support any older papis version going forward. For the time being
+> v0.14.x may still work fine but it will receive no support.
+>
+> If you really want to keep using it for older papis versions, change the minimum
+> dependency versioning of papis in `pyproject.toml` in the repository root.
 
 ## Installation
 
