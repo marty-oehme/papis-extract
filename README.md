@@ -169,22 +169,33 @@ regardless of this setting.
 
 ### Automatic tagging
 
-By supplying the tags option with a valid python dictionary of the form `{"tag": "color", "tag2": "color2"}`,
-you can enable automatic tagging for your annotations.
-
-You thus ascribe specific meanings to the colors you use in highlighting.
-
-For example, if you always highlight the most essential arguments and findings in red and always highlight things you have to follow up on in blue, you can assign the meanings 'important' and 'todo' to them respectively as follows:
+By supplying the `tags` option with a valid Python dictionary, you can enable
+automatic tagging for your annotations. The dictionary maps colors to tags:
 
 ```conf
 [plugins.extract]
 tags = {"red": "important", "blue": "toread"}
 ```
 
-Currently recognized colors are: `red` `green` `blue` `yellow` `purple` `orange`.
+You can thus ascribe specific meanings to the colors you use in highlighting.
 
-Since these meanings are often highly dependent on personal organization and reading systems,
-no defaults are set here.
+For example, if you always highlight the most essential arguments and findings
+in red and always highlight things you have to follow up on in blue, you can
+assign the meanings `"important"` and `"toread"` to them respectively.
+
+Colors can be specified as **named colors** or as **hex values** (prefixed
+with `#`):
+
+```conf
+[plugins.extract]
+tags = {"red": "important", "#00ff00": "review", "#f90": "todo"}
+```
+
+Named colors currently recognized are:
+`red` `green` `blue` `yellow` `purple` `orange`.
+
+Since these meanings are often highly dependent on personal organization and
+reading systems, no defaults are set here.
 
 ### Advanced configuration
 

@@ -29,6 +29,37 @@ COLORS: dict[str, tuple[float, float, float]] = {
 }
 
 
+def _hex_to_rgb(hex_str: str) -> tuple[float, float, float] | None:
+    """Convert a hex color string to an RGB tuple.
+
+    Supports 6-digit (``#ff0000``) and 3-digit (``#f00``) formats
+    with or without a leading ``#``. Matching is case-insensitive.
+
+    Returns ``None`` if the string is not a valid hex color.
+
+    >>> _hex_to_rgb("#ff0000")
+    (1.0, 0.0, 0.0)
+    >>> _hex_to_rgb("#f00")
+    (1.0, 0.0, 0.0)
+    >>> _hex_to_rgb("ff0000")
+    (1.0, 0.0, 0.0)
+    >>> _hex_to_rgb("#gg0000")
+    None
+    """
+    hex_str = hex_str.strip().lstrip("#")
+    if len(hex_str) == 3:
+        hex_str = "".join(c * 2 for c in hex_str)
+    if len(hex_str) != 6:
+        return None
+    try:
+        r = int(hex_str[0:2], 16) / 255.0
+        g = int(hex_str[2:4], 16) / 255.0
+        b = int(hex_str[4:6], 16) / 255.0
+        return (r, g, b)
+    except ValueError:
+        return None
+
+
 def get_color_tag_mapping() -> dict[str, str]:
     """Read the color-to-tag mapping from papis configuration.
 
@@ -57,13 +88,14 @@ def tag_from_color(
 ) -> str:
     """Derive a tag string from an annotation color.
 
-    Finds the closest named color and maps it to a user-defined tag
-    using the provided color_mapping. If no mapping is provided,
-    returns an empty string.
+    Finds the closest matching color from the mapping (either a named
+    color like ``"red"`` or a hex color like ``"#ff0000"``) and maps it
+    to a user-defined tag. If no mapping is provided, returns an empty
+    string.
 
     :param color: RGB color tuple with values between 0 and 1.
-    :param color_mapping: Mapping from color names to tag strings.
-        If None, returns an empty string.
+    :param color_mapping: Mapping from color name or hex string keys
+        to tag strings. If None, returns an empty string.
     :param minimum_similarity: Minimum similarity ratio for color matching.
     """
     if not color_mapping:
@@ -71,8 +103,19 @@ def tag_from_color(
 
     nearest: str | None = None
     best_similarity = minimum_similarity
-    for name, values in COLORS.items():
-        similarity = 1 - (abs(math.dist([*values], [*color])) / 3)
+    for name in color_mapping:
+        target_rgb: tuple[float, float, float] | None = None
+        stripped = name.strip()
+        if stripped.startswith("#"):
+            target_rgb = _hex_to_rgb(stripped)
+            if target_rgb is None:
+                continue
+        else:
+            target_rgb = COLORS.get(stripped)
+            if target_rgb is None:
+                continue
+
+        similarity = 1 - (abs(math.dist([*target_rgb], [*color])) / 3)
         if similarity >= best_similarity:
             best_similarity = similarity
             nearest = name

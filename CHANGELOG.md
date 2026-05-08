@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - Add Readest extractor
+- `tags` config option accepts hex-values as colors
 
 ### Changed
 
