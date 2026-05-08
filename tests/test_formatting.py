@@ -2,8 +2,8 @@ from papis.document import Document
 
 from papis_extract.annotation import Annotation
 from papis_extract.formatter import (
+    CsvFormatter,
     format_count,
-    format_csv,
     format_markdown,
     format_markdown_atx,
     format_markdown_setext,
@@ -52,7 +52,7 @@ def test_count_default():
 
 
 def test_csv_default():
-    fmt = format_csv
+    fmt = CsvFormatter()
     assert fmt(document, annotations) == (
         'Highlight,,0,"my lovely text","","document-author",'
         '"document-title","","myfile.pdf"\n'
@@ -61,9 +61,15 @@ def test_csv_default():
     )
 
 
+def test_csv_header():
+    fmt = CsvFormatter()
+    assert fmt.header == "type,tag,page,quote,note,author,title,ref,file"
+
+
 def test_csv_with_header():
-    fmt = format_csv
-    assert fmt(document, annotations, first=True) == (
+    fmt = CsvFormatter()
+    body = fmt(document, annotations)
+    assert fmt.header + "\n" + body == (
         "type,tag,page,quote,note,author,title,ref,file\n"
         'Highlight,,0,"my lovely text","","document-author",'
         '"document-title","","myfile.pdf"\n'
@@ -82,4 +88,4 @@ def test_count_no_annotations():
 
 
 def test_csv_no_annotations():
-    assert format_csv(document, []) == ""
+    assert CsvFormatter()(document, []) == ""

@@ -31,9 +31,8 @@ class NotesExporter:
         documents missing a note field or appends to existing.
         """
         for doc, annots in annot_docs:
-            # first always true since we write single doc per note
             formatted_annotations: list[str] = self.formatter(
-                doc, annots, first=True
+                doc, annots
             ).split("\n")
             if formatted_annotations:
                 self._add_annots_to_note(

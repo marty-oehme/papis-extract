@@ -6,27 +6,19 @@ from papis_extract.annotation import Annotation
 
 
 class Formatter(Protocol):
-    """Basic formatter protocol.
+    """Format annotations for a single document.
 
-    Every valid formatter must implement at least this protocol.
-    A formatter is a function which receives a document and a list
-    of annotations and spits them out in some formatted way.
-
-    The optional 'first' parameter signals to the formatter that
-    the current document entry is the very first one to be printed.
-    This is useful for formats like CSV that need a header row.
-    Formatters that do not need this can ignore it.
+    A formatter receives a single document and its annotations and returns
+    a formatted string. Some formatters may additionally provide a
+    header (e.g. CSV column names) via a 'header' property.
     """
 
-    def __call__(
-        self, document: Document, annotations: list[Annotation], first: bool = False
-    ) -> str: ...
+    def __call__(self, document: Document, annotations: list[Annotation]) -> str: ...
 
 
 def format_markdown(
     document: Document = Document(),
     annotations: list[Annotation] = [],
-    first: bool = False,
     headings: str = "setext",  # setext | atx | None
 ) -> str:
     if not annotations:
@@ -60,7 +52,6 @@ def format_markdown(
 def format_markdown_atx(
     document: Document = Document(),
     annotations: list[Annotation] = [],
-    first: bool = False,
 ) -> str:
     return format_markdown(document, annotations, headings="atx")
 
@@ -68,7 +59,6 @@ def format_markdown_atx(
 def format_markdown_setext(
     document: Document = Document(),
     annotations: list[Annotation] = [],
-    first: bool = False,
 ) -> str:
     return format_markdown(document, annotations, headings="setext")
 
@@ -76,7 +66,6 @@ def format_markdown_setext(
 def format_count(
     document: Document = Document(),
     annotations: list[Annotation] = [],
-    first: bool = False,
 ) -> str:
     if not annotations:
         return ""
@@ -93,30 +82,34 @@ def format_count(
     ).rstrip()
 
 
-def format_csv(
-    document: Document = Document(),
-    annotations: list[Annotation] = [],
-    first: bool = False,
-) -> str:
+class CsvFormatter:
+    """Format annotations as CSV rows.
+
+    Provides a header property with column names and formats each
+    annotation as a single CSV row.
+    """
+
     header: str = "type,tag,page,quote,note,author,title,ref,file"
-    template: str = (
+    _template: str = (
         '{{type}},{{tag}},{{page}},"{{quote}}","{{note}}",'
         '"{{doc.author}}","{{doc.title}}","{{doc.ref}}","{{file}}"'
     )
-    output = f"{header}\n" if first else ""
-    if not annotations:
-        return ""
 
-    for a in annotations:
-        output += a.format(template, doc=document)
-        output += "\n"
+    def __call__(self, document: Document, annotations: list[Annotation]) -> str:
+        if not annotations:
+            return ""
 
-    return output.rstrip()
+        output = ""
+        for a in annotations:
+            output += a.format(self._template, doc=document)
+            output += "\n"
+
+        return output.rstrip()
 
 
 formatters: dict[str, Formatter] = {
     "count": format_count,
-    "csv": format_csv,
+    "csv": CsvFormatter(),
     "markdown": format_markdown,
     "markdown-atx": format_markdown_atx,
     "markdown-setext": format_markdown_setext,

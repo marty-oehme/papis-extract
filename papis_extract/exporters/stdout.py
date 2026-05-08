@@ -17,9 +17,13 @@ class StdoutExporter:
         the annotations in somewhat of a list form.
         Not intended for machine-readability.
         """
-        first_entry = True
+        header_emitted = False
         for doc, annots in annot_docs:
-            output: str = self.formatter(doc, annots, first=first_entry)
+            output: str = self.formatter(doc, annots)
             if output:
+                if not header_emitted:
+                    h = getattr(self.formatter, "header", None)
+                    if h:
+                        print(h)
+                    header_emitted = True
                 print("{output}\n".format(output=output.rstrip("\n")))
-                first_entry = False
