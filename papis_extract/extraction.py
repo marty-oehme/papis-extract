@@ -1,6 +1,8 @@
+import re
 from pathlib import Path
 from typing import Protocol
 
+import papis.document
 import papis.logging
 from papis.document import Document
 
@@ -14,6 +16,33 @@ class Extractor(Protocol):
     def can_process(self, filename: Path) -> bool: ...
 
     def run(self, filename: Path) -> list[Annotation]: ...
+
+
+def extract_all(
+    documents: list[Document],
+    extractors: list[Extractor],
+) -> list[tuple[Document, list[Annotation]]]:
+    """Extract annotations from all documents using all given extractors.
+
+    Returns a list of (document, annotations) pairs. Logs an info
+    for documents where no extractor could process any files.
+    """
+    results: list[tuple[Document, list[Annotation]]] = []
+    for doc in documents:
+        annotations: list[Annotation] = []
+        valid_files = 0
+        for ext in extractors:
+            added = start(ext, doc)
+            if added is not None:
+                valid_files += 1
+                annotations.extend(added)
+        if valid_files == 0:
+            desc = re.sub("[{}]", "", papis.document.describe(doc))
+            logger.info(
+                f"Document {desc} has no valid extractors for any of its files."
+            )
+        results.append((doc, annotations))
+    return results
 
 
 def start(

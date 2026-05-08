@@ -1,14 +1,11 @@
-import re
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from papis_extract.annotation import Annotation
     from papis_extract.exporter import Exporter
 
 import click
 import papis.cli
 import papis.config
-import papis.document
 import papis.logging
 import papis.strings
 from papis.document import Document
@@ -146,23 +143,6 @@ def run(
             formatter=formatter or formatters["markdown"]
         )
 
-    doc_annots: list[tuple[Document, list[Annotation]]] = []
-    for doc in documents:
-        annotations: list[Annotation] = []
-        valid_files: int = 0
-        for ext in extractors:
-            if not ext:
-                continue
-            added = extraction.start(ext, doc)
-            if added is not None:
-                valid_files += 1
-                annotations.extend(added)
-        doc_annots.append((doc, annotations))
-
-        if valid_files == 0:
-            # have to remove curlys or papis logger gets upset
-            desc = re.sub("[{}]", "", papis.document.describe(doc))
-            logger.info(
-                f"Document {desc} has no valid extractors for any of its files."
-            )
+    valid_extractors = [e for e in extractors if e is not None]
+    doc_annots = extraction.extract_all(documents, valid_extractors)
     exporter.run(doc_annots)
