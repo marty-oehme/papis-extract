@@ -153,13 +153,13 @@ class Annotation:
         """Return an unambiguous developer-oriented string representation."""
         return f"Annotation(type={self.type}, file='{self.file}', color={self.color}, tag='{self.tag}', page={self.page}, content='{self.content}', note='{self.note}')"
 
-    def __eq__(self, other: object) -> bool | NotImplementedType:
+    def __eq__(self, other: object) -> bool:
         """Return True if two annotations have identical content and metadata.
 
         Comparison is case-insensitive for ``content`` and ``note`` fields.
         """
         if not isinstance(other, Annotation):
-            return NotImplemented
+            raise NotImplementedError
 
         return (
             self.content.lower(),
@@ -185,7 +185,7 @@ class Annotation:
         Annotations with ``page == 0`` (unknown page) are sorted to the end.
         """
         if not hasattr(other, "page"):
-            return NotImplemented
+            raise NotImplementedError
 
         other = cast("Annotation", other)
         selfpage = self.page if self.page != 0 else float("inf")
