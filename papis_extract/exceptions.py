@@ -7,5 +7,3 @@ class ExtractionError(Exception):
     Something went wrong during the extraction process in the extractor
     run routine itself.
     """
-
-    pass

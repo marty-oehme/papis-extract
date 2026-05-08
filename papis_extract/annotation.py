@@ -7,12 +7,9 @@ and helper functions for mapping annotation colors to user-defined tags.
 import ast
 import math
 from functools import total_ordering
-from types import NotImplementedType
 from typing import Any, cast
 
-
 import papis.config
-from papis.document import Document
 
 COLOR_SIMILARITY_MINIMUM_FALLBACK = 0.833
 
