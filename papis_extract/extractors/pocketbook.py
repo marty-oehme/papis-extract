@@ -6,7 +6,7 @@ from typing import cast
 import papis.logging
 from bs4 import BeautifulSoup
 
-from papis_extract.annotation import COLORS, Annotation
+from papis_extract.annotation import COLORS, Annotation, get_color_tag_mapping, tag_from_color
 
 logger = papis.logging.get_logger(__name__)
 
@@ -41,6 +41,7 @@ class PocketBookExtractor:
         Returns all readable annotations contained in the file
         passed in, with highlights, notes and pages if available.
         """
+        color_mapping = get_color_tag_mapping()
         content = self._read_file(filename)
         if not content:
             return []
@@ -48,7 +49,7 @@ class PocketBookExtractor:
 
         annotations: list[Annotation] = []
         for bm in html.select("div.bookmark"):
-            content = str(
+            bm_content = str(
                 (bm.select_one("div.bm-text>p") or html.new_string("")).text or ""
             )
             note = str(
@@ -65,9 +66,10 @@ class PocketBookExtractor:
 
             a = Annotation(
                 file=str(filename),
-                content=content,
+                content=bm_content,
                 note=note,
                 color=color,
+                tag=tag_from_color(color, color_mapping),
                 type="Highlight",
                 page=page,
             )

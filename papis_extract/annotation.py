@@ -1,3 +1,4 @@
+import ast
 import math
 from functools import total_ordering
 from types import NotImplementedType
@@ -22,6 +23,59 @@ COLORS: dict[str, tuple[float, float, float]] = {
 }
 
 
+def get_color_tag_mapping() -> dict[str, str]:
+    """Read the color-to-tag mapping from papis configuration.
+
+    Returns the mapping from color names to user-defined tag strings.
+    Returns an empty dict if no mapping is configured or if the
+    configuration value is invalid.
+    """
+    rawvalue: Any = papis.config.general_get("tags", section="plugins.extract")
+    if isinstance(rawvalue, dict):
+        return cast("dict[str, str]", rawvalue)
+    if rawvalue is None:
+        return {}
+    try:
+        parsed = ast.literal_eval(rawvalue)
+    except (ValueError, SyntaxError):
+        return {}
+    if isinstance(parsed, dict):
+        return cast("dict[str, str]", parsed)
+    return {}
+
+
+def tag_from_color(
+    color: tuple[float, float, float],
+    color_mapping: dict[str, str] | None = None,
+    minimum_similarity: float = COLOR_SIMILARITY_MINIMUM_FALLBACK,
+) -> str:
+    """Derive a tag string from an annotation color.
+
+    Finds the closest named color and maps it to a user-defined tag
+    using the provided color_mapping. If no mapping is provided,
+    returns an empty string.
+
+    :param color: RGB color tuple with values between 0 and 1.
+    :param color_mapping: Mapping from color names to tag strings.
+        If None, returns an empty string.
+    :param minimum_similarity: Minimum similarity ratio for color matching.
+    """
+    if not color_mapping:
+        return ""
+
+    nearest: str | None = None
+    best_similarity = minimum_similarity
+    for name, values in COLORS.items():
+        similarity = 1 - (abs(math.dist([*values], [*color])) / 3)
+        if similarity >= best_similarity:
+            best_similarity = similarity
+            nearest = name
+
+    if nearest is None:
+        return ""
+    return color_mapping.get(nearest, "")
+
+
 @total_ordering
 class Annotation:
     """A PDF annotation object.
@@ -38,18 +92,15 @@ class Annotation:
         page: int = 0,
         tag: str = "",
         type: str = "Highlight",
-        minimum_similarity_color: float | None = None,
+        minimum_similarity_color: float = COLOR_SIMILARITY_MINIMUM_FALLBACK,
     ) -> None:
         self.file = file
         self._color = color
         self.content = content
         self.note = note
         self.page = page
-        self.minimum_similarity_color = minimum_similarity_color or (
-            papis.config.getfloat("minimum_similarity_color", "plugins.extract")
-            or COLOR_SIMILARITY_MINIMUM_FALLBACK
-        )
-        self.tag = tag or self._tag_from_colorname(self.colorname or "")
+        self.minimum_similarity_color = minimum_similarity_color
+        self.tag = tag
         self.type = type
 
     def format(self, formatting: str, doc: Document = Document()):
@@ -77,7 +128,6 @@ class Annotation:
     @color.setter
     def color(self, value: tuple[float, float, float]):
         self._color = value
-        self.tag = self._tag_from_colorname(self.colorname or "")
 
     @property
     def colorname(self):
@@ -109,38 +159,6 @@ class Annotation:
         difference between full black and full white, as a float.
         """
         return 1 - (abs(math.dist([*color_one], [*color_two])) / 3)
-
-    def _tag_from_colorname(self, colorname: str) -> str:
-        color_mapping: dict[str, str] = self._getdict("tags", "plugins.extract")
-        if not color_mapping:
-            return ""
-
-        return color_mapping.get(colorname, "")
-
-    # mimics the functions in papis.config.{getlist,getint,getfloat} etc.
-    def _getdict(self, key: str, section: str | None = None) -> dict[str, str]:
-        """Dict getter
-
-        :returns: A python dict
-        :raises SyntaxError: Whenever the parsed syntax is either not a valid
-            python object or a valid python dict.
-        """
-        rawvalue: Any = papis.config.general_get(key, section=section)
-        if isinstance(rawvalue, dict):
-            return cast("dict[str, str]", rawvalue)
-        try:
-            rawvalue = eval(rawvalue)
-        except Exception:
-            raise SyntaxError(
-                f"The configuration key '{key}' must be a valid Python dict: {rawvalue}"
-            )
-        else:
-            if not isinstance(rawvalue, dict):
-                raise SyntaxError(
-                    f"The configuration key '{key}' must be a valid Python dict. Got: {rawvalue} (type {type(rawvalue).__name__})"
-                )
-
-            return cast("dict[str, str]", rawvalue)
 
     def __str__(self) -> str:
         return f"Annotation({self.type}: '{self.file}', color: {self.color}, tag: '{self.tag}', page: {self.page}, content: '{self.content}', note: '{self.note}', minimum_similarity_color: {self.minimum_similarity_color})"

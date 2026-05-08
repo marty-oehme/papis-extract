@@ -9,7 +9,7 @@ import papis.config
 import papis.logging
 import pymupdf as mu
 
-from papis_extract.annotation import Annotation
+from papis_extract.annotation import Annotation, get_color_tag_mapping, tag_from_color
 from papis_extract.exceptions import ExtractionError
 
 logger = papis.logging.get_logger(__name__)
@@ -38,6 +38,8 @@ class PdfExtractor:
         Returns all readable annotations contained in the file
         passed in. Only returns Highlight or Text annotations.
         """
+        color_mapping = get_color_tag_mapping()
+
         annotations: list[Annotation] = []
         try:
             for page, annot in self._all_pdf_annots(filename):
@@ -54,6 +56,7 @@ class PdfExtractor:
                     content=quote or "",
                     note=note or "",
                     color=color,
+                    tag=tag_from_color(color, color_mapping),
                     type=highlight_type,
                     page=page_nr,
                 )
