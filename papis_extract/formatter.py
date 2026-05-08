@@ -1,3 +1,10 @@
+"""Formatters that convert annotations into output strings.
+
+Each formatter receives a document and its annotations and returns
+a single formatted string. Formatters are registered in the
+``formatters`` dict and selected via the ``--output`` CLI flag.
+"""
+
 from typing import Protocol
 
 from papis.document import Document
@@ -13,7 +20,17 @@ class Formatter(Protocol):
     header (e.g. CSV column names) via a 'header' property.
     """
 
-    def __call__(self, document: Document, annotations: list[Annotation]) -> str: ...
+    def __call__(self, document: Document, annotations: list[Annotation]) -> str:
+        """Format annotations for a single document into a string.
+
+        Args:
+            document: The papis document containing metadata.
+            annotations: The list of annotations to format.
+
+        Returns:
+            A formatted string, or empty string if there are no annotations.
+        """
+        ...
 
 
 def format_markdown(
@@ -21,6 +38,17 @@ def format_markdown(
     annotations: list[Annotation] = [],
     headings: str = "setext",  # setext | atx | None
 ) -> str:
+    """Format annotations as Markdown with a document heading.
+
+    Args:
+        document: The papis document containing metadata.
+        annotations: The list of annotations to format.
+        headings: Heading style — ``"setext"`` for underlined titles,
+            ``"atx"`` for ``#``-prefixed titles.
+
+    Returns:
+        A Markdown-formatted string, or empty string if there are no annotations.
+    """
     if not annotations:
         return ""
     template = (
@@ -53,6 +81,15 @@ def format_markdown_atx(
     document: Document = Document(),
     annotations: list[Annotation] = [],
 ) -> str:
+    """Format annotations as Markdown with ATX-style (``#``) headings.
+
+    Args:
+        document: The papis document containing metadata.
+        annotations: The list of annotations to format.
+
+    Returns:
+        A Markdown-formatted string, or empty string if there are no annotations.
+    """
     return format_markdown(document, annotations, headings="atx")
 
 
@@ -60,6 +97,15 @@ def format_markdown_setext(
     document: Document = Document(),
     annotations: list[Annotation] = [],
 ) -> str:
+    """Format annotations as Markdown with Setext-style underlined headings.
+
+    Args:
+        document: The papis document containing metadata.
+        annotations: The list of annotations to format.
+
+    Returns:
+        A Markdown-formatted string, or empty string if there are no annotations.
+    """
     return format_markdown(document, annotations, headings="setext")
 
 
@@ -67,6 +113,16 @@ def format_count(
     document: Document = Document(),
     annotations: list[Annotation] = [],
 ) -> str:
+    """Format a single-line summary with annotation count and document info.
+
+    Args:
+        document: The papis document containing metadata.
+        annotations: The list of annotations to count.
+
+    Returns:
+        A string like ``"3 Author: Title"``, or empty string if there are
+        no annotations.
+    """
     if not annotations:
         return ""
 
@@ -96,6 +152,15 @@ class CsvFormatter:
     )
 
     def __call__(self, document: Document, annotations: list[Annotation]) -> str:
+        """Format annotations as CSV rows.
+
+        Args:
+            document: The papis document containing metadata.
+            annotations: The list of annotations to format.
+
+        Returns:
+            CSV-formatted rows, or empty string if there are no annotations.
+        """
         if not annotations:
             return ""
 
