@@ -80,6 +80,13 @@ class MarkdownFormatter:
     )
 
     def __init__(self, template: str | None = None, headings: str = "setext") -> None:
+        """Create a Markdown formatter.
+
+        Args:
+            template: Mustache template for individual annotations.
+                Defaults to ``_DEFAULT_TEMPLATE``.
+            headings: ``"setext"`` (underlined) or ``"atx"`` (``#``-prefixed).
+        """
         self._template: str = template or self._DEFAULT_TEMPLATE
         self._headings: str = headings
 
@@ -88,6 +95,7 @@ class MarkdownFormatter:
         document: Document,
         annotations: list[Annotation],
     ) -> str:
+        """Format annotations as Markdown with a document heading."""
         if not annotations:
             return ""
         output = ""
@@ -121,13 +129,18 @@ class CountFormatter:
     header: str = ""
 
     def __init__(self, template: str | None = None) -> None:
-        pass
+        """Create a count formatter.
+
+        The ``template`` parameter is accepted for interface uniformity
+        but ignored — this formatter does not use Mustache.
+        """
 
     def __call__(
         self,
         document: Document,
         annotations: list[Annotation],
     ) -> str:
+        """Return a single-line summary of annotation count and document info."""
         if not annotations:
             return ""
 
@@ -157,6 +170,12 @@ class CsvFormatter:
     )
 
     def __init__(self, template: str | None = None) -> None:
+        """Create a CSV formatter.
+
+        Args:
+            template: Mustache template for individual annotation rows.
+                Defaults to ``_DEFAULT_TEMPLATE``.
+        """
         self._template: str = template or self._DEFAULT_TEMPLATE
 
     def __call__(self, document: Document, annotations: list[Annotation]) -> str:

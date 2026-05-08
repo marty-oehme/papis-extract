@@ -1,3 +1,6 @@
+"""Exceptions for the papis-extract plugin."""
+
+
 class ExtractionError(Exception):
     """Raised for exceptions during extraction.
 

@@ -1,3 +1,5 @@
+"""Extractor for Readest exported annotation files."""
+
 # pyright: strict, reportUnknownMemberType=false
 import re
 from pathlib import Path
@@ -19,6 +21,7 @@ class ReadestExtractor:
     """
 
     def can_process(self, filename: Path) -> bool:
+        """Return ``True`` if the file looks like a Readest export."""
         if not self._is_readable_text(filename):
             return False
 
@@ -36,7 +39,7 @@ class ReadestExtractor:
         return True
 
     def _is_readable_text(self, filename: Path) -> bool:
-        """Checks whether a file has a valid text extension and is not a binary file.
+        """Check whether a file has a valid text extension and is not a binary file.
 
         A file is considered a valid text file if its extension is in
         :data:`ACCEPTED_EXTENSIONS` and does not contain any non-text characters.

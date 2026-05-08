@@ -1,3 +1,5 @@
+"""Extraction orchestration: protocol, extract_all(), and start()."""
+
 import re
 from pathlib import Path
 from typing import Protocol
@@ -13,9 +15,15 @@ logger = papis.logging.get_logger(__name__)
 
 
 class Extractor(Protocol):
-    def can_process(self, filename: Path) -> bool: ...
+    """Protocol that all annotation extractors must implement."""
 
-    def run(self, filename: Path) -> list[Annotation]: ...
+    def can_process(self, filename: Path) -> bool:
+        """Return ``True`` if this extractor can handle the given file."""
+        ...
+
+    def run(self, filename: Path) -> list[Annotation]:
+        """Extract annotations from the given file."""
+        ...
 
 
 def extract_all(

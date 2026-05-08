@@ -1,3 +1,5 @@
+"""Extractor for ReadEra exported annotation files."""
+
 # pyright: strict, reportUnknownMemberType=false
 import mimetypes
 import re
@@ -17,6 +19,7 @@ class ReadEraExtractor:
     """
 
     def can_process(self, filename: Path) -> bool:
+        """Return ``True`` if the file looks like a ReadEra export."""
         if not self._is_txt(filename):
             return False
 

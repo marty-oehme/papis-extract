@@ -1,3 +1,5 @@
+"""Extractor for PocketBook HTML bookmark exports."""
+
 # pyright: strict, reportUnknownMemberType=false
 import mimetypes
 from pathlib import Path
@@ -17,7 +19,10 @@ logger = papis.logging.get_logger(__name__)
 
 
 class PocketBookExtractor:
+    """Extract annotations from PocketBook HTML bookmark exports."""
+
     def can_process(self, filename: Path) -> bool:
+        """Return ``True`` if the file is a PocketBook HTML export."""
         if not self._is_html(filename):
             return False
 

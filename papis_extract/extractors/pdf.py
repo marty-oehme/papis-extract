@@ -1,3 +1,5 @@
+"""Extractor for PDF files using PyMuPDF."""
+
 # pyright: strict, reportMissingTypeStubs=false, reportUnknownMemberType=false
 import mimetypes
 from collections.abc import Generator
@@ -16,12 +18,17 @@ logger = papis.logging.get_logger(__name__)
 
 
 class PdfAnnot(NamedTuple):
+    """A PDF page paired with one of its annotations."""
+
     page: mu.Page
     annot: mu.Annot
 
 
 class PdfExtractor:
+    """Extract annotations from PDF files using PyMuPDF."""
+
     def can_process(self, filename: Path) -> bool:
+        """Return ``True`` if the file is a readable PDF."""
         if not filename.is_file():
             logger.error(f"File {str(filename)} not readable.")
             return False
@@ -85,7 +92,7 @@ class PdfExtractor:
     def _get_annotation_content(
         self, page: mu.Page, annotation: mu.Annot
     ) -> tuple[str | None, str | None]:
-        """Gets the text content of an annotation.
+        """Get the text content of an annotation.
 
         Returns the actual content of an annotation. Sometimes
         that is only the written words, sometimes that is only
