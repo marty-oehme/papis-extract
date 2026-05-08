@@ -36,14 +36,18 @@ whoosh = ["whoosh<3.0.0,>=2.7.4"]
 pocketbook = ["beautifulsoup4<5.0.0,>=4.12.3"]
 
 [dependency-groups]
-dev = [
-    "pytest>=9.0.3",
-    "pytest-cov>=7.1.0",
-]
+dev = ["pytest>=9.0.3", "pytest-cov>=7.1.0"]
+
+[tool.ruff]
+extend-exclude = ["tests"]
+
+[tool.ruff.format]
+docstring-code-format = true
 
 [tool.ruff.lint]
 extend-select = [
     "C4",  # Catch incorrect use of comprehensions, dict, list, etc
+    "D",   # Pydocstyle rules for docstrings
     "F",   # Pyflakes rules
     "FA",  # Enforce from __future__ import annotations
     "I",   # Sort imports properly
@@ -59,6 +63,9 @@ extend-select = [
     "W",   # PyCodeStyle warnings
 ]
 
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
@@ -71,5 +78,5 @@ filterwarnings = [
     # see https://github.com/swig/swig/issues/2881#issuecomment-2877988848
     # should hopefully be redundant with swig-4.4
     "ignore:.*builtin type SwigPy\\w* has no __module__ attribute.*:DeprecationWarning",
-    "ignore:.*builtin type swigvarlink has no __module__ attribute.*:DeprecationWarning"
+    "ignore:.*builtin type swigvarlink has no __module__ attribute.*:DeprecationWarning",
 ]

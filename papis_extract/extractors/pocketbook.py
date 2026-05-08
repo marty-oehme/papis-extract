@@ -6,7 +6,12 @@ from typing import cast
 import papis.logging
 from bs4 import BeautifulSoup
 
-from papis_extract.annotation import COLORS, Annotation, get_color_tag_mapping, tag_from_color
+from papis_extract.annotation import (
+    COLORS,
+    Annotation,
+    get_color_tag_mapping,
+    tag_from_color,
+)
 
 logger = papis.logging.get_logger(__name__)
 
