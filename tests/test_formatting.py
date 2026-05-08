@@ -2,11 +2,9 @@ from papis.document import Document
 
 from papis_extract.annotation import Annotation
 from papis_extract.formatter import (
+    CountFormatter,
     CsvFormatter,
-    format_count,
-    format_markdown,
-    format_markdown_atx,
-    format_markdown_setext,
+    MarkdownFormatter,
 )
 
 document = Document(data={"author": "document-author", "title": "document-title"})
@@ -25,12 +23,12 @@ document-title - document-author
 
 
 def test_markdown_default():
-    fmt = format_markdown
+    fmt = MarkdownFormatter()
     assert fmt(document, annotations) == md_default_output
 
 
 def test_markdown_atx():
-    fmt = format_markdown_atx
+    fmt = MarkdownFormatter(headings="atx")
     assert fmt(document, annotations) == (
         """# document-title - document-author
 
@@ -42,12 +40,12 @@ def test_markdown_atx():
 
 
 def test_markdown_setext():
-    fmt = format_markdown_setext
+    fmt = MarkdownFormatter(headings="setext")
     assert fmt(document, annotations) == md_default_output
 
 
 def test_count_default():
-    fmt = format_count
+    fmt = CountFormatter()
     assert fmt(document, annotations) == ("""2 document-author: document-title""")
 
 
@@ -80,11 +78,11 @@ def test_csv_with_header():
 
 # sadpath - no annotations contained for each format
 def test_markdown_no_annotations():
-    assert format_markdown(document, []) == ""
+    assert MarkdownFormatter()(document, []) == ""
 
 
 def test_count_no_annotations():
-    assert format_count(document, []) == ""
+    assert CountFormatter()(document, []) == ""
 
 
 def test_csv_no_annotations():
@@ -92,18 +90,8 @@ def test_csv_no_annotations():
 
 
 def test_markdown_header_empty():
-    from papis_extract.formatter import formatters
-    assert formatters["markdown"].header == ""
+    assert MarkdownFormatter().header == ""
 
 
 def test_count_header_empty():
-    from papis_extract.formatter import formatters
-    assert formatters["count"].header == ""
-
-
-def test_wrapper_preserves_call():
-    from papis_extract.formatter import _FormatterWrapper, format_count  # pyright: ignore[reportPrivateUsage]
-    wrapped = _FormatterWrapper(format_count)
-    assert wrapped.header == ""
-    result = wrapped(document, annotations)
-    assert result == format_count(document, annotations)
+    assert CountFormatter().header == ""

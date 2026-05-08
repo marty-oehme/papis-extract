@@ -1,11 +1,10 @@
 """Formatters that convert annotations into output strings.
 
 Each formatter receives a document and its annotations and returns
-a single formatted string. Formatters are registered in the
-``formatters`` dict and selected via the ``--format`` CLI flag.
+a single formatted string. Formatter classes are registered in the
+``formatter_classes`` dict and selected via the ``--format`` CLI flag.
 """
 
-from collections.abc import Callable
 from typing import Protocol
 
 import chevron
@@ -66,123 +65,99 @@ class Formatter(Protocol):
         ...
 
 
-def format_markdown(
-    document: Document = Document(),
-    annotations: list[Annotation] = [],
-    headings: str = "setext",  # setext | atx | None
-) -> str:
+class MarkdownFormatter:
     """Format annotations as Markdown with a document heading.
 
-    Args:
-        document: The papis document containing metadata.
-        annotations: The list of annotations to format.
-        headings: Heading style — ``"setext"`` for underlined titles,
-            ``"atx"`` for ``#``-prefixed titles.
-
-    Returns:
-        A Markdown-formatted string, or empty string if there are no annotations.
+    Supports setext-style (underlined) and ATX-style (``#``-prefixed)
+    headings, configurable via the ``headings`` parameter.
     """
-    if not annotations:
-        return ""
-    template = (
+
+    header: str = ""
+    _DEFAULT_TEMPLATE: str = (
         "{{#tag}}#{{tag}}\n{{/tag}}"
         "{{#quote}}> {{quote}}{{/quote}}{{#page}} [p. {{page}}]{{/page}}"
         "{{#note}}\n  NOTE: {{note}}{{/note}}"
     )
-    output = ""
 
-    heading = f"{document.get('title', '')} - {document.get('author', '')}"
-    if headings == "atx":
-        output += f"# {heading}\n\n"
-    elif headings == "setext":
-        title_decoration = (
-            f"{'=' * len(document.get('title', ''))}   "
-            f"{'-' * len(document.get('author', ''))}"
-        )
-        output += f"{title_decoration}\n{heading}\n{title_decoration}\n\n"
+    def __init__(self, template: str | None = None, headings: str = "setext") -> None:
+        self._template: str = template or self._DEFAULT_TEMPLATE
+        self._headings: str = headings
 
-    for a in annotations:
-        output += format_annotation(a, template)
-        output += "\n\n"
+    def __call__(
+        self,
+        document: Document,
+        annotations: list[Annotation],
+    ) -> str:
+        if not annotations:
+            return ""
+        output = ""
 
-    output += "\n\n\n"
+        heading = f"{document.get('title', '')} - {document.get('author', '')}"
+        if self._headings == "atx":
+            output += f"# {heading}\n\n"
+        elif self._headings == "setext":
+            title_decoration = (
+                f"{'=' * len(document.get('title', ''))}   "
+                f"{'-' * len(document.get('author', ''))}"
+            )
+            output += f"{title_decoration}\n{heading}\n{title_decoration}\n\n"
 
-    return output.rstrip()
+        for a in annotations:
+            output += format_annotation(a, self._template)
+            output += "\n\n"
 
+        output += "\n\n\n"
 
-def format_markdown_atx(
-    document: Document = Document(),
-    annotations: list[Annotation] = [],
-) -> str:
-    """Format annotations as Markdown with ATX-style (``#``) headings.
-
-    Args:
-        document: The papis document containing metadata.
-        annotations: The list of annotations to format.
-
-    Returns:
-        A Markdown-formatted string, or empty string if there are no annotations.
-    """
-    return format_markdown(document, annotations, headings="atx")
+        return output.rstrip()
 
 
-def format_markdown_setext(
-    document: Document = Document(),
-    annotations: list[Annotation] = [],
-) -> str:
-    """Format annotations as Markdown with Setext-style underlined headings.
-
-    Args:
-        document: The papis document containing metadata.
-        annotations: The list of annotations to format.
-
-    Returns:
-        A Markdown-formatted string, or empty string if there are no annotations.
-    """
-    return format_markdown(document, annotations, headings="setext")
-
-
-def format_count(
-    document: Document = Document(),
-    annotations: list[Annotation] = [],
-) -> str:
+class CountFormatter:
     """Format a single-line summary with annotation count and document info.
 
-    Args:
-        document: The papis document containing metadata.
-        annotations: The list of annotations to count.
-
-    Returns:
-        A string like ``"3 Author: Title"``, or empty string if there are
-        no annotations.
+    This formatter does not use a Mustache template. The ``template``
+    constructor parameter is accepted for interface uniformity and ignored.
     """
-    if not annotations:
-        return ""
 
-    count = 0
-    for _ in annotations:
-        count += 1
+    header: str = ""
 
-    return (
-        f"{count} "
-        f"{document.get('author', '')}"
-        f"{': ' if 'author' in document else ''}"  # only put separator if author
-        f"{document.get('title', '')}"
-    ).rstrip()
+    def __init__(self, template: str | None = None) -> None:
+        pass
+
+    def __call__(
+        self,
+        document: Document,
+        annotations: list[Annotation],
+    ) -> str:
+        if not annotations:
+            return ""
+
+        count = 0
+        for _ in annotations:
+            count += 1
+
+        return (
+            f"{count} "
+            f"{document.get('author', '')}"
+            f"{': ' if 'author' in document else ''}"
+            f"{document.get('title', '')}"
+        ).rstrip()
 
 
 class CsvFormatter:
     """Format annotations as CSV rows.
 
-    Provides a header property with column names and formats each
+    Provides a header with column names and formats each
     annotation as a single CSV row.
     """
 
     header: str = "type,tag,page,quote,note,author,title,ref,file"
-    _template: str = (
+    _DEFAULT_TEMPLATE: str = (
         '{{type}},{{tag}},{{page}},"{{quote}}","{{note}}",'
         '"{{doc.author}}","{{doc.title}}","{{doc.ref}}","{{file}}"'
     )
+
+    def __init__(self, template: str | None = None) -> None:
+        self._template: str = template or self._DEFAULT_TEMPLATE
 
     def __call__(self, document: Document, annotations: list[Annotation]) -> str:
         """Format annotations as CSV rows.
@@ -205,22 +180,10 @@ class CsvFormatter:
         return output.rstrip()
 
 
-class _FormatterWrapper:
-    """Adapts a bare function to the Formatter interface with header."""
-
-    header: str = ""
-
-    def __init__(self, fn: Callable[[Document, list[Annotation]], str]) -> None:
-        self.__wrapped__ = fn
-
-    def __call__(self, document: Document, annotations: list[Annotation]) -> str:
-        return self.__wrapped__(document, annotations)
-
-
-formatters: dict[str, Formatter] = {
-    "count": _FormatterWrapper(format_count),
-    "csv": CsvFormatter(),
-    "markdown": _FormatterWrapper(format_markdown),
-    "markdown-atx": _FormatterWrapper(format_markdown_atx),
-    "markdown-setext": _FormatterWrapper(format_markdown_setext),
+formatter_classes: dict[str, type[Formatter]] = {
+    "count": CountFormatter,
+    "csv": CsvFormatter,
+    "markdown": MarkdownFormatter,
+    "markdown-atx": MarkdownFormatter,
+    "markdown-setext": MarkdownFormatter,
 }

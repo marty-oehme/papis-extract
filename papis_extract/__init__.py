@@ -4,7 +4,7 @@ This module defines the ``papis extract`` subcommand via Click and the
 ``run()`` function that wires together extractors, formatters, and exporters.
 """
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from papis_extract.exporter import Exporter
@@ -19,7 +19,7 @@ from papis.document import Document
 from papis_extract import extraction
 from papis_extract.exporters import all_exporters
 from papis_extract.extractors import all_extractors
-from papis_extract.formatter import Formatter, formatters
+from papis_extract.formatter import Formatter, formatter_classes
 
 logger = papis.logging.get_logger(__name__)
 
@@ -58,7 +58,7 @@ papis.config.register_default_settings(DEFAULT_OPTIONS)
     "-t",
     "format_",
     type=click.Choice(
-        list(formatters.keys()),
+        list(formatter_classes.keys()),
         case_sensitive=False,
     ),
     help="Output format for annotations.",
@@ -69,7 +69,7 @@ papis.config.register_default_settings(DEFAULT_OPTIONS)
     "--output",
     "output",
     type=click.Choice(
-        list(formatters.keys()),
+        list(formatter_classes.keys()),
         case_sensitive=False,
     ),
     hidden=True,
@@ -100,12 +100,12 @@ def main(
     # _file: bool,
     # _dir: bool,
     _all: bool,
-    doc_folder: str,
+    doc_folder: str | None,
     manual: bool,
     write: bool,
     extractors: list[str],
-    format_: str,
-    output: str,
+    format_: str | None,
+    output: str | None,
     git: bool,
     duplicates: bool,
 ) -> None:
@@ -122,7 +122,11 @@ def main(
     if set in the plugin configuration.
     """
     documents = papis.cli.handle_doc_folder_query_all_sort(
-        query, doc_folder, sort_field=None, sort_reverse=False, _all=_all
+        query,
+        doc_folder,  # ty:ignore[invalid-argument-type] (CAN be None in papis)
+        sort_field=None,
+        sort_reverse=False,
+        _all=_all,
     )
     if not documents:
         logger.warning(papis.strings.no_documents_retrieved_message)
@@ -131,22 +135,36 @@ def main(
     # NOTE: Guard for deprecated --output option. Can be removed on option removal
     if output and not format_:
         format_ = output
-    formatter = formatters.get(format_)
 
     run(
         documents,
+        format_name=format_,
         edit=manual,
         write=write,
         git=git,
-        formatter=formatter,
         extractors=[all_extractors.get(e) for e in extractors],
         duplicates=duplicates,
     )
 
 
+def _instantiate_formatter(format_name: str, template: str | None) -> Formatter:
+    """Create a formatter instance from the registry with resolved config."""
+    cls = formatter_classes[format_name]
+    kwargs: dict[str, Any] = {}
+    if template:
+        kwargs["template"] = template
+    if format_name.startswith("markdown"):
+        suffix = format_name.removeprefix("markdown")
+        if suffix.startswith("-"):
+            kwargs["headings"] = suffix[1:]  # "atx" or "setext"
+        else:
+            kwargs["headings"] = "setext"
+    return cls(**kwargs)
+
+
 def run(
     documents: list[Document],
-    formatter: Formatter | None,
+    format_name: str | None,
     extractors: list[extraction.Extractor | None],
     edit: bool = False,
     write: bool = False,
@@ -158,19 +176,23 @@ def run(
     Picks the right exporter (notes vs stdout) based on the *write* flag,
     extracts annotations from all documents using the given extractors,
     and runs the exporter with the chosen formatter.
+    Picks a markdown formatter if none is given depending on exporter,
+    with notes defaulting to markdown-atx and stdout to markdown-setext.
     """
+    if not format_name:
+        format_name = "markdown-atx" if write else "markdown-setext"
+    formatter = _instantiate_formatter(format_name, template=None)
+
     exporter: Exporter
     if write:
         exporter = all_exporters["notes"](
-            formatter=formatter or formatters["markdown-atx"],
+            formatter=formatter,
             edit=edit,
             git=git,
             duplicates=duplicates,
         )
     else:
-        exporter = all_exporters["stdout"](
-            formatter=formatter or formatters["markdown"]
-        )
+        exporter = all_exporters["stdout"](formatter=formatter)
 
     valid_extractors = [e for e in extractors if e is not None]
     doc_annots = extraction.extract_all(documents, valid_extractors)
