@@ -10,7 +10,7 @@ from functools import total_ordering
 from types import NotImplementedType
 from typing import Any, cast
 
-import chevron
+
 import papis.config
 from papis.document import Document
 
@@ -117,24 +117,6 @@ class Annotation:
         self.page = page
         self.tag = tag
         self.type = type
-
-    def format(self, formatting: str, doc: Document = Document()):
-        """Return a formatted string of the annotation.
-
-        Given a provided formatting pattern, this method returns the annotation
-        formatted with the correct marker replacements and removals, ready
-        for display or writing.
-        """
-        data = {
-            "file": self.file,
-            "quote": self.content,
-            "note": self.note,
-            "page": self.page,
-            "tag": self.tag,
-            "type": self.type,
-            "doc": doc,
-        }
-        return chevron.render(formatting, data)
 
     @property
     def color(self):

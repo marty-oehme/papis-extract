@@ -7,9 +7,39 @@ a single formatted string. Formatters are registered in the
 
 from typing import Protocol
 
+import chevron
 from papis.document import Document
 
 from papis_extract.annotation import Annotation
+
+
+def format_annotation(
+    annotation: Annotation,
+    template: str,
+    doc: Document | None = None,
+) -> str:
+    """Render an annotation against a Mustache template.
+
+    Builds a data dictionary from the annotation's fields and the
+    optional document, then renders it through ``chevron``.
+
+    The template may reference annotation fields directly (e.g.,
+    ``{{quote}}``, ``{{tag}}``, ``{{page}}``, ``{{note}}``,
+    ``{{type}}``, ``{{file}}``) and document fields via ``{{doc.*}}``
+    (e.g. ``{{doc.author}}``, ``{{doc.title}}``, ``{{doc.ref}}``).
+    """
+    if doc is None:
+        doc = Document()
+    data = {
+        "file": annotation.file,
+        "quote": annotation.content,
+        "note": annotation.note,
+        "page": annotation.page,
+        "tag": annotation.tag,
+        "type": annotation.type,
+        "doc": doc,
+    }
+    return chevron.render(template, data)
 
 
 class Formatter(Protocol):
@@ -69,7 +99,7 @@ def format_markdown(
         output += f"{title_decoration}\n{heading}\n{title_decoration}\n\n"
 
     for a in annotations:
-        output += a.format(template)
+        output += format_annotation(a, template)
         output += "\n\n"
 
     output += "\n\n\n"
@@ -166,7 +196,7 @@ class CsvFormatter:
 
         output = ""
         for a in annotations:
-            output += a.format(self._template, doc=document)
+            output += format_annotation(a, self._template, doc=document)
             output += "\n"
 
         return output.rstrip()

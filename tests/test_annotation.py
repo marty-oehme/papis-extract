@@ -6,6 +6,7 @@ from papis_extract.annotation import (
     get_color_tag_mapping,
     tag_from_color,
 )
+from papis_extract.formatter import format_annotation
 
 
 def test_value_inequality_comparison():
@@ -65,7 +66,7 @@ def test_formatting_replacements(fmt_string: str, expected: str):
         note="Whereas I represent the note",
     )
 
-    assert sut.format(fmt_string) == expected
+    assert format_annotation(sut, fmt_string) == expected
 
 
 @pytest.mark.parametrize(
@@ -84,7 +85,7 @@ def test_formatting_document_access(fmt_string: str, expected: str):
     )
     doc = Document(data={"title": "document-title", "author": "document-author"})
 
-    assert sut.format(fmt_string, doc=doc) == expected
+    assert format_annotation(sut, fmt_string, doc=doc) == expected
 
 
 def test_tag_from_color_exact_match():
