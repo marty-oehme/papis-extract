@@ -1,3 +1,9 @@
+"""CLI entry point and orchestration for annotation extraction.
+
+This module defines the ``papis extract`` subcommand via Click and the
+``run()`` function that wires together extractors, formatters, and exporters.
+"""
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -147,6 +153,12 @@ def run(
     git: bool = False,
     duplicates: bool = False,
 ) -> None:
+    """Extract annotations from documents and export them.
+
+    Picks the right exporter (notes vs stdout) based on the *write* flag,
+    extracts annotations from all documents using the given extractors,
+    and runs the exporter with the chosen formatter.
+    """
     exporter: Exporter
     if write:
         exporter = all_exporters["notes"](
