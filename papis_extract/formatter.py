@@ -12,15 +12,14 @@ class Formatter(Protocol):
     A formatter is a function which receives a document and a list
     of annotations and spits them out in some formatted way.
 
-    Formatters additionally must take the (often optional) passed
-    parameter 'first' which signals to the formatter that the current
-    document entry is the very first one to be printed in whatever
-    exporter is used, if multiple entries are printed.
-    This can be useful for adding a header if necessary for the format.
+    The optional 'first' parameter signals to the formatter that
+    the current document entry is the very first one to be printed.
+    This is useful for formats like CSV that need a header row.
+    Formatters that do not need this can ignore it.
     """
 
     def __call__(
-        self, document: Document, annotations: list[Annotation], first: bool
+        self, document: Document, annotations: list[Annotation], first: bool = False
     ) -> str: ...
 
 
