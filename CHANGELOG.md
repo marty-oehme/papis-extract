@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 
 - Extend minimum Python version support to Python 3.10
 - Extract ROADMAP from README
+- ! Changed `--output` option to `--format` as it actually changes the formatter used
 
 ### Fixed
 

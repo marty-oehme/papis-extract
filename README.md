@@ -103,26 +103,26 @@ On my current laptop, extracting ~4000 annotations from ~1000 library documents 
 though this will vary with the length and size of the PDFs you have.
 For smaller workloads the process should be almost instant.
 
-You can change the format that you want your annotations in with the `--output` option.
+You can change the format that you want your annotations in with the `--format` option.
 To output annotations in a markdown-compatible syntax (the default), do:
 
 ```bash
-papis extract --output markdown
+papis extract --format markdown
 ```
 
-There are sub-variants of the formatter for atx-style headers, with `--output markdown-atx` (`# Headings`),
-or setext-style with `--output markdown-setext` (the default style).
+There are sub-variants of the formatter for atx-style headers, with `--format markdown-atx` (`# Headings`),
+or setext-style with `--format markdown-setext` (the default style).
 
 To instead see them in a csv syntax simply invoke:
 
 ```bash
-papis extract --output csv
+papis extract --format csv
 ```
 
 And if you only want to know how many annotations exist in the documents, you can invoke:
 
 ```bash
-papis extract --output count
+papis extract --format count
 ```
 
 For now, these are the only formatters the plugin knows about.

@@ -2,7 +2,7 @@
 
 Each formatter receives a document and its annotations and returns
 a single formatted string. Formatters are registered in the
-``formatters`` dict and selected via the ``--output`` CLI flag.
+``formatters`` dict and selected via the ``--format`` CLI flag.
 """
 
 from typing import Protocol

@@ -48,14 +48,27 @@ papis.config.register_default_settings(DEFAULT_OPTIONS)
     show_default=True,
 )
 @click.option(
-    "--output",
-    "-o",
+    "--format",
+    "-t",
+    "format_",
     type=click.Choice(
         list(formatters.keys()),
         case_sensitive=False,
     ),
-    help="Choose which format to output annotations in.",
+    help="Output format for annotations.",
     show_default=True,
+)
+# NOTE: Deprecated option, to be removed in upcoming release
+@click.option(
+    "--output",
+    "output",
+    type=click.Choice(
+        list(formatters.keys()),
+        case_sensitive=False,
+    ),
+    hidden=True,
+    help="Choose which format to output annotations in.",
+    deprecated="Instead of '--output', use `--format`.",
 )
 @click.option(
     "--input",
@@ -85,6 +98,7 @@ def main(
     manual: bool,
     write: bool,
     extractors: list[str],
+    format_: str,
     output: str,
     git: bool,
     duplicates: bool,
@@ -108,7 +122,10 @@ def main(
         logger.warning(papis.strings.no_documents_retrieved_message)
         return
 
-    formatter = formatters.get(output)
+    # NOTE: Guard for deprecated --output option. Can be removed on option removal
+    if output and not format_:
+        format_ = output
+    formatter = formatters.get(format_)
 
     run(
         documents,
