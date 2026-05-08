@@ -89,3 +89,21 @@ def test_count_no_annotations():
 
 def test_csv_no_annotations():
     assert CsvFormatter()(document, []) == ""
+
+
+def test_markdown_header_empty():
+    from papis_extract.formatter import formatters
+    assert formatters["markdown"].header == ""
+
+
+def test_count_header_empty():
+    from papis_extract.formatter import formatters
+    assert formatters["count"].header == ""
+
+
+def test_wrapper_preserves_call():
+    from papis_extract.formatter import _FormatterWrapper, format_count  # pyright: ignore[reportPrivateUsage]
+    wrapped = _FormatterWrapper(format_count)
+    assert wrapped.header == ""
+    result = wrapped(document, annotations)
+    assert result == format_count(document, annotations)

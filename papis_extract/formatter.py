@@ -5,6 +5,7 @@ a single formatted string. Formatters are registered in the
 ``formatters`` dict and selected via the ``--format`` CLI flag.
 """
 
+from collections.abc import Callable
 from typing import Protocol
 
 import chevron
@@ -49,6 +50,8 @@ class Formatter(Protocol):
     a formatted string. Some formatters may additionally provide a
     header (e.g. CSV column names) via a 'header' property.
     """
+
+    header: str
 
     def __call__(self, document: Document, annotations: list[Annotation]) -> str:
         """Format annotations for a single document into a string.
@@ -202,10 +205,22 @@ class CsvFormatter:
         return output.rstrip()
 
 
+class _FormatterWrapper:
+    """Adapts a bare function to the Formatter interface with header."""
+
+    header: str = ""
+
+    def __init__(self, fn: Callable[[Document, list[Annotation]], str]) -> None:
+        self.__wrapped__ = fn
+
+    def __call__(self, document: Document, annotations: list[Annotation]) -> str:
+        return self.__wrapped__(document, annotations)
+
+
 formatters: dict[str, Formatter] = {
-    "count": format_count,
+    "count": _FormatterWrapper(format_count),
     "csv": CsvFormatter(),
-    "markdown": format_markdown,
-    "markdown-atx": format_markdown_atx,
-    "markdown-setext": format_markdown_setext,
+    "markdown": _FormatterWrapper(format_markdown),
+    "markdown-atx": _FormatterWrapper(format_markdown_atx),
+    "markdown-setext": _FormatterWrapper(format_markdown_setext),
 }

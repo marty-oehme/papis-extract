@@ -31,7 +31,11 @@ class NotesExporter:
         documents missing a note field or appends to existing.
         """
         for doc, annots in annot_docs:
-            formatted_annotations: list[str] = self.formatter(doc, annots).split("\n")
+            header = self.formatter.header
+            output = self.formatter(doc, annots)
+            if header:
+                output = f"{header}\n{output}"
+            formatted_annotations: list[str] = output.split("\n")
             if formatted_annotations:
                 self._add_annots_to_note(
                     doc, formatted_annotations, duplicates=self.duplicates

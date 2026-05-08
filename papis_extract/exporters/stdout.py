@@ -22,8 +22,8 @@ class StdoutExporter:
             output: str = self.formatter(doc, annots)
             if output:
                 if not header_emitted:
-                    h = getattr(self.formatter, "header", None)
-                    if h:
-                        print(h)
+                    header = self.formatter.header
+                    if header:
+                        print(header)
                     header_emitted = True
                 print("{output}\n".format(output=output.rstrip("\n")))
