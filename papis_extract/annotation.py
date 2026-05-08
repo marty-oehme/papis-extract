@@ -1,3 +1,9 @@
+"""Annotation data model and color-tag mapping utilities.
+
+Provides the ``Annotation`` class for representing PDF annotations
+and helper functions for mapping annotation colors to user-defined tags.
+"""
+
 import ast
 import math
 from functools import total_ordering
@@ -94,6 +100,19 @@ class Annotation:
         type: str = "Highlight",
         minimum_similarity_color: float = COLOR_SIMILARITY_MINIMUM_FALLBACK,
     ) -> None:
+        """Initialize an Annotation.
+
+        Args:
+            file: Path to the source file containing the annotation.
+            color: RGB color tuple with values between 0 and 1.
+            content: The highlighted or annotated text.
+            note: A user-written note attached to the annotation.
+            page: The page number where the annotation appears.
+            tag: A user-defined tag derived from the annotation color.
+            type: The annotation type, e.g. ``"Highlight"`` or ``"Note"``.
+            minimum_similarity_color: Minimum color similarity ratio for
+                matching the annotation color to a named color.
+        """
         self.file = file
         self._color = color
         self.content = content
@@ -123,6 +142,7 @@ class Annotation:
 
     @property
     def color(self):
+        """Return the RGB color tuple of the annotation."""
         return self._color
 
     @color.setter
@@ -161,12 +181,18 @@ class Annotation:
         return 1 - (abs(math.dist([*color_one], [*color_two])) / 3)
 
     def __str__(self) -> str:
+        """Return a human-readable string representation of the annotation."""
         return f"Annotation({self.type}: '{self.file}', color: {self.color}, tag: '{self.tag}', page: {self.page}, content: '{self.content}', note: '{self.note}', minimum_similarity_color: {self.minimum_similarity_color})"
 
     def __repr__(self) -> str:
+        """Return an unambiguous developer-oriented string representation."""
         return f"Annotation(type={self.type}, file='{self.file}', color={self.color}, tag='{self.tag}', page={self.page}, content='{self.content}', note='{self.note}', minimum_similarity_color={self.minimum_similarity_color})"
 
     def __eq__(self, other: object) -> bool | NotImplementedType:
+        """Return True if two annotations have identical content and metadata.
+
+        Comparison is case-insensitive for ``content`` and ``note`` fields.
+        """
         if not isinstance(other, Annotation):
             return NotImplemented
 
@@ -189,6 +215,10 @@ class Annotation:
         )
 
     def __lt__(self, other: object) -> bool:
+        """Return True if this annotation appears earlier in the document than *other*.
+
+        Annotations with ``page == 0`` (unknown page) are sorted to the end.
+        """
         if not hasattr(other, "page"):
             return NotImplemented
 
