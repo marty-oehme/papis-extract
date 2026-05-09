@@ -1,0 +1,114 @@
+name: Release and Publish
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  lint:
+    uses: ./.github/workflows/lint.yml
+  test:
+    uses: ./.github/workflows/test.yml
+
+  build:
+    name: Build distribution
+    runs-on: ubuntu-latest
+    needs:
+    - lint
+    - test
+
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        persist-credentials: false
+    - name: Set up Python
+      uses: astral-sh/setup-uv@v8.1.0
+
+    - name: Ensure dependencies
+      run: uv sync --frozen
+
+    - name: Build a binary wheel and a source tarball
+      run: uv build
+
+    - name: Store the distribution packages
+      uses: actions/upload-artifact@v7
+      with:
+        name: python-package-distributions
+        path: dist/
+
+  publish-to-testpypi:
+    name: Test Publish to TestPyPI
+    runs-on: ubuntu-latest
+    needs:
+    - build
+
+    environment:
+      name: testpypi
+
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for trusted publishing
+
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        persist-credentials: false
+    - name: Download all the dists
+      uses: actions/download-artifact@v8
+      with:
+        name: python-package-distributions
+        path: dist/
+
+    - name: Set up Python
+      uses: astral-sh/setup-uv@v8.1.0
+    - name: Publish distribution to TestPyPI
+      run: uv publish --index testpypi
+
+
+  publish:
+    name: Publish to PyPI
+    runs-on: ubuntu-latest
+    needs:
+    - build
+
+    environment:
+      name: pypi
+
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for trusted publishing
+
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        persist-credentials: false
+    - name: Download all the dists
+      uses: actions/download-artifact@v8
+      with:
+        name: python-package-distributions
+        path: dist/
+
+    - name: Set up Python
+      uses: astral-sh/setup-uv@v8.1.0
+    - name: Publish distribution to PyPI
+      run: uv publish
+
+  release:
+    name: Generate GitHub release
+    runs-on: ubuntu-latest
+    needs:
+    - build
+
+    permissions:
+      contents: write
+
+    steps:
+    - name: Install parse-changelog
+      uses: taiki-e/install-action@parse-changelog
+    - name: Parse latest changelog
+      run: parse-changelog CHANGELOG.md > changed.txt
+    - name: Create release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: dist/*
+        body_path: changed.txt
+        prerelease: ${{ contains(github.ref_name, 'rc') }}  # Pre-release if tag has hyphen
