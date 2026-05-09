@@ -2,11 +2,8 @@ name: Publish to PyPI
 
 on:
   push:
-    branches: [main]
     tags:
       - "v*.*.*"
-  pull_request: # TODO: To be removed after successful dryrun
-    branches: [main]
 
 jobs:
   lint:
