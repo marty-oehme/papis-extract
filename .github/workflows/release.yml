@@ -17,6 +17,9 @@ jobs:
   build:
     name: Build distribution
     runs-on: ubuntu-latest
+    needs:
+    - lint
+    - test
 
     steps:
     - uses: actions/checkout@v6
@@ -41,8 +44,6 @@ jobs:
     name: Test Publish to TestPyPI
     runs-on: ubuntu-latest
     needs:
-    - lint
-    - test
     - build
 
     environment:
