@@ -1,0 +1,82 @@
+name: Publish to PyPI
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - "v*.*.*"
+  pull_request: # TODO: To be removed after successful dryrun
+    branches: [main]
+
+jobs:
+  build:
+    name: Build distribution
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        persist-credentials: false
+    - name: Set up Python
+      uses: astral-sh/setup-uv@v8.1.0
+
+    - name: Ensure dependencies
+      run: uv sync --frozen
+
+    - name: Build a binary wheel and a source tarball
+      run: uv build
+
+    - name: Store the distribution packages
+      uses: actions/upload-artifact@v7
+      with:
+        name: python-package-distributions
+        path: dist/
+
+  publish-to-testpypi:
+    name: Test Publish to TestPyPI
+    runs-on: ubuntu-latest
+    needs:
+    - build
+
+    environment:
+      name: testpypi
+
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for trusted publishing
+
+    steps:
+    - name: Download all the dists
+      uses: actions/download-artifact@v8
+      with:
+        name: python-package-distributions
+        path: dist/
+
+    - name: Set up Python
+      uses: astral-sh/setup-uv@v8.1.0
+    - name: Publish distribution to TestPyPI
+      run: uv publish --index testpypi
+
+
+  # publish:
+  #   name: Publish to PyPI
+  #   runs-on: ubuntu-latest
+  #   needs:
+  #   - build
+  #
+  #   environment:
+  #     name: pypi
+  #
+  #   permissions:
+  #     id-token: write  # IMPORTANT: mandatory for trusted publishing
+  #
+  #   steps:
+  #   - name: Download all the dists
+  #     uses: actions/download-artifact@v8
+  #     with:
+  #       name: python-package-distributions
+  #       path: dist/
+  #
+  #   - name: Set up Python
+  #     uses: astral-sh/setup-uv@v8.1.0
+  #   - name: Publish distribution to TestPyPI
+  #     run: uv publish
