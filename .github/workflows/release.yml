@@ -111,4 +111,4 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         files: dist/*
-        prerelease: ${{ contains(github.ref_name, '-') }}  # Pre-release if tag has hyphen
+        prerelease: ${{ contains(github.ref_name, 'rc') }}  # Pre-release if tag has hyphen
