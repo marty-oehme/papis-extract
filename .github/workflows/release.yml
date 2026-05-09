@@ -102,6 +102,9 @@ jobs:
       contents: write
 
     steps:
+    - uses: actions/checkout@v6
+      with:
+        persist-credentials: false
     - name: Install parse-changelog
       uses: taiki-e/install-action@parse-changelog
     - name: Parse latest changelog
