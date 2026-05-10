@@ -29,6 +29,7 @@ class PdfExtractor:
 
     def can_process(self, filename: Path) -> bool:
         """Return ``True`` if the file is a readable PDF."""
+        logger.debug(f"Checking if we can parse: {filename}")
         if not filename.is_file():
             logger.error(f"File {filename!s} not readable.")
             return False

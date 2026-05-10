@@ -22,6 +22,7 @@ class ReadestExtractor:
 
     def can_process(self, filename: Path) -> bool:
         """Return ``True`` if the file looks like a Readest export."""
+        logger.debug(f"Checking if we can parse: {filename}")
         if not self._is_readable_text(filename):
             return False
 

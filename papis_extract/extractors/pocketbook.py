@@ -23,6 +23,7 @@ class PocketBookExtractor:
 
     def can_process(self, filename: Path) -> bool:
         """Return ``True`` if the file is a PocketBook HTML export."""
+        logger.debug(f"Checking if we can parse: {filename}")
         if not self._is_html(filename):
             return False
 

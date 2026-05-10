@@ -20,6 +20,7 @@ class ReadEraExtractor:
 
     def can_process(self, filename: Path) -> bool:
         """Return ``True`` if the file looks like a ReadEra export."""
+        logger.debug(f"Checking if we can parse: {filename}")
         if not self._is_txt(filename):
             return False
 
