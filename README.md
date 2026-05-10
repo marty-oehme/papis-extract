@@ -1,10 +1,10 @@
 # papis-extract
 
+![GitHub Release](https://img.shields.io/github/v/release/marty-oehme/papis-extract)
+![PyPI - Version](https://img.shields.io/pypi/v/papis-extract)
+![GitHub Actions Test Workflow Status](https://img.shields.io/github/actions/workflow/status/marty-oehme/papis-extract/test.yml?label=tests)
 [![status-badge](https://ci.martyoeh.me/api/badges/Marty/papis-extract/status.svg)](https://ci.martyoeh.me/Marty/papis-extract)
-
-<!-- TODO have to set up pypi badge
-![PyPI](https://img.shields.io/pypi/v/papis-extract)
--->
+![GitHub Actions Release Workflow Status](https://img.shields.io/github/actions/workflow/status/marty-oehme/papis-extract/release.yml?label=release)
 
 Quickly extract annotations from your files with the help of the [papis](https://github.com/papis/papis) bibliography manager.\
 Easily organize all your highlights and thoughts next to your documents and references.\
@@ -20,33 +20,61 @@ Extract from PDFs, a variety of ebook formats, or implement your own exporters f
 
 ## Installation
 
-<!-- TODO set up pypi repository / explain git install path -->
+The plugin is available on [PyPI](https://pypi.org/project/papis-extract/). Install it with pip:
 
-You can install through pip with `pip install git+https://git.martyoeh.me/Marty/papis-extract.git`.
+```bash
+pip install papis-extract
+```
 
-That's it! If you have papis and papis-extract installed in the same environment (whether virtual or global),
+If you have papis and papis-extract installed in the same environment (whether virtual or global),
 everything should now be set up.
 
-I am currently working towards the first release for pypi, see the below roadmap;
-when that is done you will also be able to install in the usual pypi way.
+If you manage your python environments with `uv`, you can also inject it into the papis environment:
 
-If you manage your python environments with `pipx`, you can also `pipx inject --spec 'git+git+https://git.martyoeh.me/Marty/papis-extract.git` to add it to your specific papis environment.
+```bash
+uv tool install --with papis-extract papis
+```
+
+Or if you manage your python environments with `pipx`:
+
+```bash
+pipx inject papis papis-extract
+```
+
+### Installing from source
+
+You can also install directly from the repository to track the latest changes:
+
+```bash
+pip install git+https://git.martyoeh.me/Marty/papis-extract.git
+```
+
+Or, for `pipx` users:
+
+```bash
+pipx inject --spec 'git+https://git.martyoeh.me/Marty/papis-extract.git' papis
+```
 
 To check if everything is working you should now see the `extract` command listed when running `papis --help`.
-You will be set up with the default options but if you want to change anything, read on in configuration below.
+You will be set up with the default options.
+If you want to change anything, read on in configuration below.
+
+## Usage
 
 > **Note**
 > This plugin is still in fairly early development.
 > It does what I need it to do, but if you have a meticulously organized library _please_ make backups before doing any operation which could affect your notes, or make use of the papis-included git options.
 > Take care to read the Issues section of this README if you intend to run it over a large collection.
 
-## Usage
-
 `papis extract [OPTIONS] [QUERY]`
 
 You can get additional help on the plugin command line options with the usual `papis extract --help` command.
 
-The basic command above, `papis extract` without any options or queries will allow you to select an entry in your library from which it will extract all annotations (from all PDF files associated).
+The basic command above, `papis extract` without any options or queries,
+will allow you to select an entry in your library,
+go through all the files associated with this entry and extract the annotations from all files it
+can parse.
+A list of available extractors is provided [below](#extractors).
 
 Add a query to limit the search, as you do with papis.
 
@@ -230,91 +258,184 @@ This should generally be an alright default but is here to be changed for exampl
 
 ## Extractors
 
-Currently, the program supports two annotation extractors:
+In this early state, the plugin supports four annotation extractors
+(largely due to me using the associated applications).
 
-A **`pdf` extractor**, which takes highlights and annotations embedded in any PDF file.
+Over time there will be changes to the way this plugin interacts with extractors to make it more
+extensible and easier to use for your own use-case.
+
+### `pdf`
+
+Takes highlights and annotations embedded in any PDF file.
 It should work with most PDF styles, as long as annotations are marked as such
 (does not work if e.g. highlights are baked onto text, or there is no text in the file).
 
-A `pocketbook` extractor, which takes bookmarks exported from the mobile [PocketBook](https://pocketbook.ch/en-ch/app) reader applications.
+### `readera`
+
+Takes annotations exported from the [ReadEra](https://readera.org/) book reading app (Android, iOS).
+ReadEra can export annotations as `.txt` files with a specific format: a title and author header,
+`*****` separators between entries, and optional notes prefixed with `--`.
+Import the exported file into your library using `papis add` (or `papis addto` to attach it to an
+existing document reference) and run extract to transfer those annotations into your notes.
+
+> **Note**
+> Annotation color information is only available from the premium version of ReadEra.
+> I don't have access to the premium version, so there is no color extraction implemented yet.
+> If you use ReadEra and have the premium version, pull requests warmly welcomed.
+
+### `readest`
+
+Takes annotations exported from the [Readest](https://readest.com/) open-source book reading app
+(Windows, macOS, Linux, iOS, Android).
+Readest recently introduced custom formatting for their annotation exports. Ensure that you
+export to `markdown`, with only the following format options enabled:
+
+- [ ] Title
+- [ ] Author
+- [x] Export Date (important to allow papis-extract to detect `**Exported from Readest**` header)
+- [ ] Chapter Titles
+- [ ] Chapter Separator
+- [x] Highlights
+- [x] Notes
+- [x] Page Number
+- [ ] Note Date
+
+> **Note**
+> Other options can be enabled here, but they will just be seen as 'additional annotations'.
+> We can extend the extractor in the future to parse more of these options,
+> but with the rapid development pace of Readest I am waiting for the format to settle first.
+
+### `pocketbook`
+
+Takes bookmarks exported from the mobile [PocketBook](https://pocketbook.ch/en-ch/app) reader applications.
 You can export bookmarks by opening a book, going to the notes list and selecting `Export notes...`.
 Then import the resulting `.html` file into the library like any other document using `papis add`
 (or `papis addto` to add it to existing document references).
 You are then ready to use extract to get those annotations from the exported list into your notes.
 
+This extractor requires the additional packages to function, so install the correct optional group
+with `pip install 'papis-extract[pocketbook]'`.
+
 ## Issues
 
-First, a note in general: There is the functionality to run this plugin over your whole library in a single command and also in a way that makes permanent changes to that library.
-This is intended and, in my view, an important aspect of what this plugin provides and the batch functionality of cli programs in general.
-However, it can also lead to frustrating clean-up time if something messes up or, in the worst case, data loss.
-The extractors attempt to ascertain what files they can operate on with certain heuristics but will not be fail-safe.
-Take the note at the top of this README to heart and always have backups on hand before larger operations.
+### Data safety
 
-A note on the extraction: Highlights in pdfs can be somewhat difficult to parse
-(as are most things in them). Sometimes they contain the selected text that is written on the
-page, sometimes they contain the annotators thoughts as a note, sometimes they contain nothing.
-This plugin makes an effort to find the right combination and extract the written words,
-as well as any additional notes made - but things _will_ slip through or extract weirdly every now
-and again.
+This plugin can run over your whole library in a single command and make permanent changes to it.
+This is intentional - batch operations are a core feature of CLI tools after all - but it also means
+things can go wrong. The extractors use heuristics to determine which files they can operate on, but
+they are not fail-safe.
 
-Secondly, a note on the pages: I use the page number that the mupdf library gives me when it
-extracts anything from the pdf file. Sometimes that number will be correct for the document,
-sometimes it will however be the number of the _pdf document_ internally. This can happen if
-e.g. an article or a book has frontmatter without numbering scheme or with a different one.
-Sometimes the correct pages will still be embedded in the pdf and everything will work,
-others it won't. So always double check your page numbers!
+**Before any large operation, ensure you have backups** (or use papis' built-in git integration).
+The warning at the top of this README bears repeating.
 
-I am not sure if there is much I can do about these issues for now.
+### Extraction quality
+
+Highlights in PDFs are notoriously difficult to parse. An annotation entry content field may
+contain:
+
+- the selected text as it appears on the page,
+- the annotator's own notes or thoughts,
+- both, or
+- nothing at all.
+
+This plugin makes a best-effort attempt to find the right combination and extract both the
+highlighted text and any associated notes - but things _will_ slip through or extract oddly
+from time to time. If you encounter consistently bad extractions for a particular document,
+please open an issue with the details.
+
+### Page numbers
+
+The plugin uses the page number reported by the mupdf library. Sometimes this matches the
+printed page number on the document; other times it reports the internal PDF page number,
+which can differ if the document has frontmatter (roman numerals, unnumbered sections, etc.).
+Always double-check page numbers in your extracted annotations, _especially_ for books or articles
+with non-standard pagination.
+
+### Reporting problems
+
+If you run into any of the above issues - or discover new ones - don't hesitate to open an issue.
+Include the document format, the reader app used to create annotations, and (if possible)
+a minimal example file. This helps a lot with debugging.
 
 ## For developers
 
-and for myself whenever I forget. The basic building blocks currently in here are three:
+### Architecture
 
-- extractors (= input format)
-  : Extract data from a source file attached to a papis document.
-  Crawls the actual files attached to documents to put them into annotation-friendly formats.
+The codebase is organized around four building blocks that form a pipeline:
 
-- formatters (= output format)
-  : Make sure the exporter saves the annotation data according to your preferred layout,
-  such as a markdown syntax or csv-structure.
-
-- annotations
-  : The actual extracted blocks of text, containing some metadata
-  info as well, such as their color, type, page.
-
-- exporters
-  : Put the extracted data somewhere. For now stdout or into your notes.
-
-Splitting it into those building blocks makes it easier to recombine them in any way,
-should someone want to save highlights as csv data in their notes,
-or to include additional extractors or formatters.
-
-To develop it together with an isolated `papis` instance you can simply inject papis into your
-development environment, e.g. invoking the uv environment shell and then manually installing:
-
-```bash
-uv shell
-pip install papis
+```ascii
+document file
+↓
+EXTRACTOR
+↓
+ANNOTATION objects
+↓
+FORMATTER
+↓
+EXPORTER
+↓
+output
 ```
 
-This will leave you with `papis` installed in the same virtual environment as your development.
-However, what I do on my system instead to enable quick testing is inject it into a
-system-wide (but isolated with `pipx`) papis setup:
+- **`Extractor`** (`papis_extract/extractors/`): reads a source file attached to a papis document
+  and returns a list of `Annotation` objects. Each extractor knows how to parse a specific file
+  format (PDF, ReadEra export, Readest export, PocketBook export). No side-effects.
+- **`Annotation`** (`papis_extract/annotation.py`): a data class holding the extracted text,
+  note, page number, color, type, and file reference.
+- **`Formatter`** (`papis_extract/formatters/`): converts annotations into a string representation
+  (markdown, CSV, count-only). Formatters are classes that implement `__call__` - they
+  can be pure functional classes, but some carry internal data. No side-effects.
+- **`Exporter`** (`papis_extract/exporters/`): writes the formatted output somewhere (stdout
+  or into papis notes). Exporters implement `run()` as an effectful operation.
+
+Splitting the pipeline this way makes it easy to recombine pieces — for example, saving highlights
+as CSV in your notes, or adding a new extractor for a different reading app without touching the
+rest of the code.
+
+New extractors and formatters register themselves in the respective `__init__.py` module
+(`papis_extract/extractors/__init__.py` or `papis_extract/formatters/__init__.py`).
+
+### Development setup
+
+This project uses [uv](https://docs.astral.sh/uv/) for dependency management.
 
 ```bash
-pipx install papis             # create an isolated papis installation reachable form anywhere
-pipx inject --editable papis . # inject this folder into the environment and keep up with any changes
+# Clone the repository
+git clone <repo-url>
+cd papis-extract
+
+# Create a virtual environment and install dependencies
+uv sync
+
+# Run the test suite
+uv run pytest -v
+
+# Run the linter
+uv run ruff check .
 ```
 
-This for me provides the ideal compromise of clean dev environment (papis is not directly part of it)
-but quickly reachable installation to test my changes.
+To test the plugin with an actual papis instance, you have two options:
 
----
+1. **Inject papis into your dev venv** — simple, keeps everything in one place:
 
-If you spot a bug or have an idea feel free to open an issue.\
-I might be slow to respond but will consider them all!
+   ```bash
+   uv run pip install papis
+   uv run papis extract --help
+   ```
 
-Pull requests are warmly welcomed.\
-If they are larger changes or additions let's talk about them in an issue first.
+2. **Inject the plugin into a pipx-managed papis** — keeps your dev environment clean
+   and lets you test changes immediately (my preferred approach):
 
-Thanks for using my software ❤️
+   ```bash
+   uv tool install --with-editable /path/to/your/repo/of/papis-extract papis
+   ```
+
+### Contributing
+
+Bug reports and feature ideas are welcome — please open an issue.
+I may be slow to respond but will consider them all.
+
+Pull requests are warmly welcomed. For larger changes or additions,
+please open an issue first so we can discuss the direction.
+
+Thanks for using this software ❤️
