@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 
 - Readest: Parse files which do not export title/author
 - Readest: Fix crash when last line of export is an annotation
+- Readest: Correctly parse annotations even if they are on first lines of file
 
 <!-- ### Removed -->
 

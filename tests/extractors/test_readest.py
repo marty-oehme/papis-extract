@@ -155,6 +155,23 @@ def test_run_extracts_from_marker_on_first_line(tmp_path: Path) -> None:
     assert result[0].file == str(f)
 
 
+def test_run_handles_minimal_export_without_header(tmp_path: Path) -> None:
+    """A Readest export with no title/author must not lose annotations.
+
+    This test should prevent regressions after removing a ``[2:]`` slice in
+    ``run()`` which assumed exactly 2 header lines. When the export has none
+    (export marker directly followed by annotations), annotations within the
+    first 2 lines were silently dropped.
+    """
+    content = '**Exported from Readest**: 2026-05-10\n> "A quote on line 1"\n'
+    f = _write_fixture(tmp_path, "export.txt", content)
+    ext = ReadestExtractor()
+    result = ext.run(f)
+    assert len(result) == 1
+    assert result[0].content == "A quote on line 1"
+    assert result[0].note == ""
+
+
 # ── run() edge cases ─────────────────────────────────────────────
 
 

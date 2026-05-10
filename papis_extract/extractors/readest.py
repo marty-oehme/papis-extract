@@ -61,7 +61,7 @@ class ReadestExtractor:
         Returns all readable annotations contained in the file passed in, with
         highlights and notes if available.
         """
-        content = self._read_file(filename)[2:]
+        content = self._read_file(filename)
         if not content:
             return []
 
