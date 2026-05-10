@@ -28,6 +28,22 @@ def test_can_process_valid_export(tmp_path: Path) -> None:
     assert ext.can_process(Path("tests/resources/Readest_sample.txt"))
 
 
+def test_can_process_marker_on_first_line(tmp_path: Path) -> None:
+    """Export where **Exported from Readest** is on the very first line."""
+    content = (
+        "**Exported from Readest**: 2026-05-10\n"
+        "\n"
+        "---\n"
+        "\n"
+        "## Highlights & Annotations\n"
+        "\n"
+        "> What the teachings do offer is wisdom.\n"
+    )
+    f = _write_fixture(tmp_path, "export.txt", content)
+    ext = ReadestExtractor()
+    assert ext.can_process(f)
+
+
 @pytest.mark.parametrize("ext", [".md", ".txt", ".qmd", ".rmd"])
 def test_can_process_accepted_extensions(tmp_path: Path, ext: str) -> None:
     """All accepted extensions are recognized."""

@@ -30,9 +30,9 @@ class ReadestExtractor:
         if not content:
             return False
 
-        # look for star-shaped divider pattern
         if not re.search(
-            r"\n\*\*Exported from Readest\*\*: \d{4}-\d{2}-\d{2}\n", "".join(content)
+            r"(?:^|\n)\*\*Exported from Readest\*\*: \d{4}-\d{2}-\d{2}\n",
+            "".join(content),
         ):
             return False
 

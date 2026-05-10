@@ -8,7 +8,9 @@ All notable changes to this project will be documented in this file.
 
 <!-- ### Changed -->
 
-<!-- ### Fixed -->
+### Fixed
+
+- Readest: Parse files which do not export title/author
 
 <!-- ### Removed -->
 
