@@ -72,7 +72,7 @@ class ReadestExtractor:
             entry_note: str = ""
             if line.startswith("> "):
                 entry_content = line.lstrip('> "').rstrip('\n" ')
-                nextline = content[i + 1]
+                nextline = content[i + 1] if i + 1 < len(content) else ""
                 if nextline.startswith("**Note**:: "):
                     entry_note = nextline.removeprefix("**Note**:: ").strip()
 

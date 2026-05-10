@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 
 - Readest: Parse files which do not export title/author
+- Readest: Fix crash when last line of export is an annotation
 
 <!-- ### Removed -->
 

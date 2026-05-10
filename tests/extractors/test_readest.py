@@ -158,6 +158,25 @@ def test_run_extracts_from_marker_on_first_line(tmp_path: Path) -> None:
 # ── run() edge cases ─────────────────────────────────────────────
 
 
+def test_run_quote_on_last_line_no_crash(tmp_path: Path) -> None:
+    """A "> " line as the very last line must not cause IndexError."""
+    content = (
+        "**Exported from Readest**: 2026-05-10\n"
+        "\n"
+        "---\n"
+        "\n"
+        "## Highlights & Annotations\n"
+        "\n"
+        "> A quote on the last line"
+    )
+    f = _write_fixture(tmp_path, "export.txt", content)
+    ext = ReadestExtractor()
+    result = ext.run(f)
+    assert len(result) == 1
+    assert result[0].content == "A quote on the last line"
+    assert result[0].note == ""
+
+
 def test_run_quote_with_note(tmp_path: Path) -> None:
     """A "> " line followed by **Note**:: captures the note."""
     content = (
