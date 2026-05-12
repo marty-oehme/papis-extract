@@ -14,7 +14,8 @@ class StdoutExporter:
 
     Formats each document's annotations using the configured formatter
     and prints them to stdout. Format-level headers (e.g., CSV column
-    names) are emitted once before the first document.
+    names) are emitted once before the first document. Document blocks
+    are separated by the formatter's ``document_separator``.
     """
 
     formatter: Formatter
@@ -22,18 +23,14 @@ class StdoutExporter:
     def run(self, annot_docs: list[tuple[Document, list[Annotation]]]) -> None:
         """Print annotations to stdout.
 
-        Iterates over document/annotation pairs, formats each via
-        the configured formatter, and prints the result to stdout.
-        If the formatter provides a header, it is printed once
-        before the first non-empty document output.
+        Formats each document/annotation pair, filters empty outputs,
+        then prints the header (if any) and the joined outputs.
+        Document blocks are separated by ``self.formatter.document_separator``.
         """
-        header_emitted = False
-        for doc, annots in annot_docs:
-            output: str = self.formatter(doc, annots)
-            if output:
-                if not header_emitted:
-                    header = self.formatter.header
-                    if header:
-                        print(header)
-                    header_emitted = True
-                print("{output}\n".format(output=output.rstrip("\n")))
+        outputs = [self.formatter(doc, annots) for doc, annots in annot_docs]
+        outputs = [o for o in outputs if o]
+        if not outputs:
+            return
+        if self.formatter.header:
+            print(self.formatter.header)
+        print(self.formatter.document_separator.join(outputs))

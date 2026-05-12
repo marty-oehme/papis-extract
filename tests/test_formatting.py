@@ -95,3 +95,24 @@ def test_markdown_header_empty():
 
 def test_count_header_empty():
     assert CountFormatter().header == ""
+
+
+class TestSeparators:
+    """Integration-style checks with real formatters."""
+
+    def test_csv_separator_is_newline(self):
+        """CSV uses newline separator to avoid blank rows between docs."""
+        from papis_extract.formatter import CsvFormatter
+
+        assert CsvFormatter.document_separator == "\n"
+
+    def test_markdown_separator_is_double_newline(self):
+        """Markdown uses double-newline for spacing between doc blocks."""
+        from papis_extract.formatter import MarkdownFormatter
+
+        assert MarkdownFormatter.document_separator == "\n\n"
+
+    def test_count_separator_is_newline(self):
+        from papis_extract.formatter import CountFormatter
+
+        assert CountFormatter.document_separator == "\n"

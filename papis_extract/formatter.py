@@ -43,14 +43,19 @@ def format_annotation(
 
 
 class Formatter(Protocol):
-    """Format annotations for a single document.
+    r"""Format annotations for a single document.
 
     A formatter receives a single document and its annotations and returns
     a formatted string. Some formatters may additionally provide a
     header (e.g. CSV column names) via a 'header' property.
+
+    Each formatter declares a ``document_separator`` string that exporters use
+    between individual document blocks (e.g. ``"\n"`` for CSV, ``"\n\n"`` for
+    Markdown).
     """
 
     header: str
+    document_separator: str
 
     def __call__(self, document: Document, annotations: list[Annotation]) -> str:
         """Format annotations for a single document into a string.
@@ -73,6 +78,7 @@ class MarkdownFormatter:
     """
 
     header: str = ""
+    document_separator: str = "\n\n"
     _DEFAULT_TEMPLATE: str = (
         "{{#tag}}#{{tag}}\n{{/tag}}"
         "{{#quote}}> {{quote}}{{/quote}}{{#page}} [p. {{page}}]{{/page}}"
@@ -127,6 +133,7 @@ class CountFormatter:
     """
 
     header: str = ""
+    document_separator: str = "\n"
 
     def __init__(self, template: str | None = None) -> None:
         """Create a count formatter.
@@ -164,6 +171,7 @@ class CsvFormatter:
     """
 
     header: str = "type,tag,page,quote,note,author,title,ref,file"
+    document_separator: str = "\n"
     _DEFAULT_TEMPLATE: str = (
         '{{type}},{{tag}},{{page}},"{{quote}}","{{note}}",'
         '"{{doc.author}}","{{doc.title}}","{{doc.ref}}","{{file}}"'
