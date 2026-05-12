@@ -1,10 +1,10 @@
 # papis-extract
 
-![GitHub Release](https://img.shields.io/github/v/release/marty-oehme/papis-extract)
-![PyPI - Version](https://img.shields.io/pypi/v/papis-extract)
-![GitHub Actions Test Workflow Status](https://img.shields.io/github/actions/workflow/status/marty-oehme/papis-extract/test.yml?label=tests)
+[![GitHub Release](https://img.shields.io/github/v/release/marty-oehme/papis-extract)](https://github.com/marty-oehme/papis-extract/releases/latest)
+[![PyPI - Version](https://img.shields.io/pypi/v/papis-extract)](https://pypi.org/project/papis-extract/)
+[![GitHub Actions Test Workflow Status](https://img.shields.io/github/actions/workflow/status/marty-oehme/papis-extract/test.yml?label=tests)](https://github.com/marty-oehme/papis-extract/actions/workflows/test.yml)
 [![status-badge](https://ci.martyoeh.me/api/badges/Marty/papis-extract/status.svg)](https://ci.martyoeh.me/Marty/papis-extract)
-![GitHub Actions Release Workflow Status](https://img.shields.io/github/actions/workflow/status/marty-oehme/papis-extract/release.yml?label=release)
+[![GitHub Actions Release Workflow Status](https://img.shields.io/github/actions/workflow/status/marty-oehme/papis-extract/release.yml?label=release)](https://github.com/marty-oehme/papis-extract/actions/workflows/release.yml)
 
 Quickly extract annotations from your files with the help of the [papis](https://github.com/papis/papis) bibliography manager.\
 Easily organize all your highlights and thoughts next to your documents and references.\
