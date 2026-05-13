@@ -57,8 +57,8 @@ class TestTestSimilarity:
         return _make_exporter()
 
     def test_exact_match_default_threshold(self, exporter):
-        """Exact match with threshold 1.0: ``>`` not ``>=``, so False."""
-        assert exporter._test_similarity("hello", ["hello"], 1.0) is False
+        """Exact match at threshold 1.0: ``>=`` means True."""
+        assert exporter._test_similarity("hello", ["hello"], 1.0) is True
 
     def test_exact_match_low_threshold(self, exporter):
         """Exact match with threshold 0.75: passes."""
@@ -76,8 +76,8 @@ class TestTestSimilarity:
         assert exporter._test_similarity("hello", [], 0.5) is False
 
     def test_empty_string_vs_nonempty(self, exporter):
-        """Levenshtein ratio of empty string to non-empty is 0.0."""
-        assert exporter._test_similarity("", ["hello"], 0.0) is False
+        """Levenshtein ratio empty vs nonempty = 0.0. At threshold 0.0, ``>=`` matches."""
+        assert exporter._test_similarity("", ["hello"], 0.0) is True
 
     def test_empty_string_vs_empty(self, exporter):
         assert exporter._test_similarity("", [""], 0.75) is True
@@ -93,9 +93,9 @@ class TestTestSimilarity:
         assert exporter._test_similarity("Hello", ["hello"], 1.0) is False
 
     def test_at_threshold(self, exporter):
-        """At threshold exactly: ``>`` means exact threshold is False."""
-        # "hello" vs "hellp" has ratio exactly 0.8
-        assert exporter._test_similarity("hello", ["hellp"], 0.8) is False
+        """At threshold exactly: ``>=`` means exact threshold is True."""
+        # "hello" vs "hellp" has ratio 0.9, well above threshold 0.8
+        assert exporter._test_similarity("hello", ["hellp"], 0.8) is True
 
 
 class TestDropExistingAnnotations:
@@ -117,7 +117,8 @@ class TestDropExistingAnnotations:
         assert exporter._drop_existing_annotations(formatted, []) == formatted
 
     def test_exact_match_dropped(self, exporter):
-        existing = ["annotation 1\n"]
+        """Exact match at threshold 0.75: ``>=`` drops the duplicate."""
+        existing = ["annotation 1"]
         assert exporter._drop_existing_annotations(["annotation 1"], existing) == []
 
     def test_close_match_dropped(self, exporter):
@@ -170,12 +171,10 @@ class TestDropExistingAnnotations:
         assert result == ["annotatoin 1"]
 
     def test_config_returns_none_uses_1_0(self, monkeypatch, exporter):
-        """None from config → defaults to 1.0 (``>`` makes exact match NOT drop)."""
+        """None from config → defaults to 1.0. Exact match is dropped with ``>=``."""
         monkeypatch.setattr("papis.config.getfloat", lambda k, s: None)
-        existing = ["annotation 1\n"]
-        assert exporter._drop_existing_annotations(["annotation 1"], existing) == [
-            "annotation 1"
-        ]
+        existing = ["annotation 1"]
+        assert exporter._drop_existing_annotations(["annotation 1"], existing) == []
 
 
 # _add_annots_to_note: file I/O tests

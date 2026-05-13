@@ -147,6 +147,6 @@ class NotesExporter:
     ) -> bool:
         for line in lines:
             ratio = Levenshtein.ratio(string, line)
-            if ratio > minimum_similarity:
+            if ratio >= minimum_similarity:
                 return True
         return False

@@ -8,7 +8,9 @@ All notable changes to this project will be documented in this file.
 
 <!-- ### Changed -->
 
-<!-- ### Fixed -->
+### Fixed
+
+- Correct duplicate similarity checking threshold (1.0 means exact similarity)
 
 <!-- ### Removed -->
 
