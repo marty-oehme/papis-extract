@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 
 - Correct duplicate similarity checking threshold (1.0 means exact similarity)
 - Do not write notes without annotation content
+- Correctly version notes when invoked with `--git` option
 
 <!-- ### Removed -->
 

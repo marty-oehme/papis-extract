@@ -53,7 +53,7 @@ class NotesExporter:
             formatted_annotations: list[str] = output.split("\n")
             if formatted_annotations:
                 self._add_annots_to_note(
-                    doc, formatted_annotations, duplicates=self.duplicates
+                    doc, formatted_annotations, git=self.git, duplicates=self.duplicates
                 )
 
             if self.edit:

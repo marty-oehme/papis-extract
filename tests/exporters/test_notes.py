@@ -319,7 +319,7 @@ class TestRun:
         args = mock_add.call_args[0]
         assert args[0] is _doc
         assert args[1] == ["line1", "line2"]  # "line1\nline2".split("\n")
-        assert mock_add.call_args[1] == {"duplicates": False}
+        assert mock_add.call_args[1] == {"git": False, "duplicates": False}
 
     def test_single_doc_empty_annotations(self, exporter):
         """Empty annotations → formatter returns '' → skipped, not called."""
@@ -339,7 +339,7 @@ class TestRun:
         mock_add = MagicMock()
         exporter._add_annots_to_note = mock_add
         exporter.run([(_doc, _annots)])
-        assert mock_add.call_args[1] == {"duplicates": True}
+        assert mock_add.call_args[1] == {"git": False, "duplicates": True}
 
     def test_edit_flag(self, monkeypatch):
         mock_edit = MagicMock()
@@ -358,6 +358,7 @@ class TestRun:
         exporter._add_annots_to_note = mock_add
         exporter.run([(_doc, _annots)])
         mock_edit.assert_called_once_with(_doc, git=True)
+        assert mock_add.call_args[1]["git"] is True
 
     def test_edit_not_called_when_false(self):
         """When edit=False, edit_notes() is never invoked."""
@@ -366,6 +367,22 @@ class TestRun:
         exporter._add_annots_to_note = mock_add
         exporter.run([(_doc, _annots)])
         # passes if no exception (edit_notes would crash without DB)
+
+    def test_git_flag_passed_to_add_annots(self):
+        """git=True, edit=False → _add_annots_to_note receives git=True."""
+        exporter = _make_exporter(edit=False, git=True)
+        mock_add = MagicMock()
+        exporter._add_annots_to_note = mock_add
+        exporter.run([(_doc, _annots)])
+        assert mock_add.call_args[1]["git"] is True
+
+    def test_git_false_passed_to_add_annots(self):
+        """git=False → _add_annots_to_note receives git=False explicitly."""
+        exporter = _make_exporter(edit=False, git=False)
+        mock_add = MagicMock()
+        exporter._add_annots_to_note = mock_add
+        exporter.run([(_doc, _annots)])
+        assert mock_add.call_args[1]["git"] is False
 
     def test_header_prepended_to_output(self):
         class _Fmt:
