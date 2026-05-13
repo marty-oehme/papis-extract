@@ -41,8 +41,13 @@ class NotesExporter:
         documents missing a note field or appends to existing.
         """
         for doc, annots in annot_docs:
-            header = self.formatter.header
             output = self.formatter(doc, annots)
+            if not output:
+                logger.debug(
+                    f"No annotations found, writing no note for {papis.document.describe(doc)}"
+                )
+                continue
+            header = self.formatter.header
             if header:
                 output = f"{header}\n{output}"
             formatted_annotations: list[str] = output.split("\n")

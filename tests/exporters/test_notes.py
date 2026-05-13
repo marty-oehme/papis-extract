@@ -322,11 +322,11 @@ class TestRun:
         assert mock_add.call_args[1] == {"duplicates": False}
 
     def test_single_doc_empty_annotations(self, exporter):
-        """Empty annotations → formatter returns '' → split("\\n")=[""] → called."""
+        """Empty annotations → formatter returns '' → skipped, not called."""
         mock_add = MagicMock()
         exporter._add_annots_to_note = mock_add
         exporter.run([(_doc, [])])
-        mock_add.assert_called_once_with(_doc, [""], duplicates=False)
+        mock_add.assert_not_called()
 
     def test_multiple_docs(self, exporter):
         mock_add = MagicMock()
@@ -383,11 +383,7 @@ class TestRun:
         assert mock_add.call_args[0][1] == ["COL1,COL2", "row1"]
 
     def test_header_but_empty_formatter_output(self):
-        """Header only: formatter returns '' but header prepended and passed.
-
-        An empty formatter output fed to ``run()`` results in the header line being
-        passed to ``_add_annots_to_note`` even if there are no annotation rows.
-        """
+        """Empty formatter output → skip doc, no header written, no note created."""
 
         class _Fmt:
             header = "COL1,COL2"
@@ -400,8 +396,7 @@ class TestRun:
         mock_add = MagicMock()
         exporter._add_annots_to_note = mock_add
         exporter.run([(_doc, [])])
-        # "COL1,COL2\n".split("\n") = ["COL1,COL2", ""]
-        mock_add.assert_called_once()
+        mock_add.assert_not_called()
 
     def test_formatter_output_only_whitespace(self):
         """Edge case: output is only newlines."""

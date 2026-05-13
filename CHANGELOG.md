@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 
 - Correct duplicate similarity checking threshold (1.0 means exact similarity)
+- Do not write notes without annotation content
 
 <!-- ### Removed -->
 
