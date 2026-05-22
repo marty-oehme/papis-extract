@@ -3,7 +3,6 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-import Levenshtein
 import papis.commands.edit
 import papis.config
 import papis.document
@@ -13,6 +12,11 @@ from papis.document import Document
 from papis.logging import get_logger
 
 from papis_extract.annotation import Annotation
+from papis_extract.exporters._io import (
+    check_similarity,
+    drop_existing_annotations,
+    write_annotations_to_file,
+)
 from papis_extract.formatter import Formatter
 
 logger = get_logger(__name__)
@@ -66,51 +70,28 @@ class NotesExporter:
         git: bool = False,
         duplicates: bool = False,
     ) -> None:
-        """
-        Append new annotations to the end of a note.
+        """Append new annotations to the end of a note.
 
-        This function appends new annotations to the end of a note file. It takes in a
-        document object containing the note, a list of formatted annotations to be
-        added, and optional flags git and duplicates. If git is True, the changes will be
-        committed to git. If duplicates is True, the annotations will be added even if they
-        already exist in the note.
-
-        :param document: The document object representing the note
-        :type document: class:`papis.document.Document`
-        :param formatted_annotations: A list of already formatted annotations to be added
-        :type formatted_annotations: list[str]
-        :param git: Flag indicating whether to commit changes to git, defaults to False.
-        :type git: bool, optional
-        :param duplicates:  Flag indicating whether to force adding annotations as duplicates
-            even if they already exist, defaults to False.
-        :type duplicates: bool, optional
+        Delegates the read / dedup / write work to
+        ``write_annotations_to_file``, then optionally commits via git.
         """
         logger.debug("Adding annotations to note...")
         notes_path = Path(papis.notes.notes_path_ensured(document))
 
-        existing: list[str] = []
-        with notes_path.open("r") as fr:
-            existing = fr.readlines()
+        minimum_similarity = (
+            papis.config.getfloat("minimum_similarity", "plugins.extract") or 1.0
+        )
 
-        new_annotations: list[str] = formatted_annotations
-        if not duplicates:
-            new_annotations = self._drop_existing_annotations(
-                formatted_annotations, existing
-            )
-        if not new_annotations:
-            logger.debug("No new annotations to be added.")
-            return
-
-        with notes_path.open("a") as fa:
-            # add newline if theres no empty space at file end
-            if len(existing) > 0 and existing[-1].strip() != "":
-                fa.write("\n")
-            # We filter out any empty lines from the annotations
-            filtered_annotations = [annot for annot in new_annotations if annot != ""]
-            fa.write("\n\n".join(filtered_annotations))
+        written = write_annotations_to_file(
+            notes_path,
+            formatted_annotations,
+            duplicates=duplicates,
+            minimum_similarity=minimum_similarity,
+        )
+        if written:
             logger.info(
-                f"Wrote {len(filtered_annotations)} "
-                f"{'line' if len(filtered_annotations) == 1 else 'lines'} "
+                f"Wrote {written} "
+                f"{'line' if written == 1 else 'lines'} "
                 f"to {papis.document.describe(document)}"
             )
 
@@ -127,31 +108,18 @@ class NotesExporter:
     ) -> list[str]:
         """Return the input annotations, dropping any that already exist.
 
-        Takes a list of formatted annotations and a list of strings
-        (most probably existing lines in a file). If any annotations
-        match an existing line closely enough, they will be dropped.
-
-        Returns list of annotations without duplicates.
+        Thin wrapper around ``drop_existing_annotations`` from ``_io``
+        that reads the similarity threshold from papis config first.
         """
         minimum_similarity = (
             papis.config.getfloat("minimum_similarity", "plugins.extract") or 1.0
         )
-
-        remaining: list[str] = []
-        for an in formatted_annotations:
-            an_split = an.splitlines()
-            if an_split and not self._test_similarity(
-                an_split[0], file_lines, minimum_similarity
-            ):
-                remaining.append(an)
-
-        return remaining
+        return drop_existing_annotations(
+            formatted_annotations, file_lines, minimum_similarity
+        )
 
     def _test_similarity(
         self, string: str, lines: list[str], minimum_similarity: float = 1.0
     ) -> bool:
-        for line in lines:
-            ratio = Levenshtein.ratio(string, line)
-            if ratio >= minimum_similarity:
-                return True
-        return False
+        """Thin wrapper around ``check_similarity`` from ``_io``."""
+        return check_similarity(string, lines, minimum_similarity)
