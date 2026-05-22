@@ -4,6 +4,7 @@ This module defines the ``papis extract`` subcommand via Click and the
 ``run()`` function that wires together extractors, formatters, and exporters.
 """
 
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -42,10 +43,14 @@ papis.config.register_default_settings(DEFAULT_OPTIONS)
 @papis.cli.git_option(help="Commit changes made to the notes files.")
 @papis.cli.all_option()
 @click.option(
-    "--write/--no-write",
+    "--write",
     "-w",
-    help="Write extracted annotations into papis notes.",
-    show_default=True,
+    "write_mode",
+    is_flag=False,
+    flag_value="notes",
+    default=None,
+    help="Export to papis document notes (without argument), or to FILE.",
+    metavar="[FILE]",
 )
 @click.option(
     "--manual/--no-manual",
@@ -102,7 +107,7 @@ def main(
     _all: bool,
     doc_folder: str | None,
     manual: bool,
-    write: bool,
+    write_mode: str | None,
     extractors: list[str],
     format_: str | None,
     output: str | None,
@@ -140,7 +145,7 @@ def main(
         documents,
         format_name=format_,
         edit=manual,
-        write=write,
+        write_mode=write_mode,
         git=git,
         extractors=[all_extractors.get(e) for e in extractors],
         duplicates=duplicates,
@@ -167,28 +172,40 @@ def run(
     format_name: str | None,
     extractors: list[extraction.Extractor | None],
     edit: bool = False,
-    write: bool = False,
+    write_mode: str | None = None,
     git: bool = False,
     duplicates: bool = False,
 ) -> None:
     """Extract annotations from documents and export them.
 
-    Picks the right exporter (notes vs stdout) based on the *write* flag,
-    extracts annotations from all documents using the given extractors,
+    Picks the right exporter based on *write_mode*:
+
+    - ``None`` → ``StdoutExporter`` (to stdout)
+    - ``"notes"`` → ``NotesExporter`` (to papis notes)
+    - Any other string → ``FileExporter`` (to the given file path)
+
+    Extracts annotations from all documents using the given extractors
     and runs the exporter with the chosen formatter.
     Picks a markdown formatter if none is given depending on exporter,
-    with notes defaulting to markdown-atx and stdout to markdown-setext.
+    with file/notes defaulting to markdown-atx and stdout to
+    markdown-setext.
     """
     if not format_name:
-        format_name = "markdown-atx" if write else "markdown-setext"
+        format_name = "markdown-atx" if write_mode else "markdown-setext"
     formatter = _instantiate_formatter(format_name, template=None)
 
     exporter: Exporter
-    if write:
+    if write_mode == "notes":
         exporter = all_exporters["notes"](
             formatter=formatter,
             edit=edit,
             git=git,
+            duplicates=duplicates,
+        )
+    elif write_mode:
+        exporter = all_exporters["file"](
+            formatter=formatter,
+            file_path=Path(write_mode),
             duplicates=duplicates,
         )
     else:

@@ -10,6 +10,7 @@ registering it in ``all_exporters``.
 """
 
 from papis_extract.exporter import Exporter
+from papis_extract.exporters.file_exporter import FileExporter
 from papis_extract.exporters.notes import NotesExporter
 from papis_extract.exporters.stdout import StdoutExporter
 
@@ -17,4 +18,5 @@ from papis_extract.exporters.stdout import StdoutExporter
 all_exporters: dict[str, type[Exporter]] = {
     "stdout": StdoutExporter,
     "notes": NotesExporter,
+    "file": FileExporter,
 }

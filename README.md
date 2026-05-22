@@ -98,6 +98,12 @@ With this duplication detection you should be able to run extract as often as yo
 **PLEASE** Heed the note above and exercise caution with the `--write` option.
 It is not intended to be destructive, but nevertheless create backups or version control your files.
 
+You can also manually choose where you want to write output by giving a file path to the `--write` option:
+
+```bash
+papis extract --write ~/einstein-annotations.md "author:Einstein"
+```
+
 If you wish to invoke the extraction process on all notes included in the query,
 use `--all` as usual with papis:
 

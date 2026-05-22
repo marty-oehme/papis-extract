@@ -4,7 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-<!-- ### Added -->
+### Added
+
+- optional file path option for `--write [FILE]` which directly writes output to given file
 
 <!-- ### Changed -->
 
